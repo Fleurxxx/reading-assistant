@@ -1,219 +1,219 @@
-# Content Script - Text Extraction & Word Analysis
+# 内容脚本 - 文本提取与单词分析
 
-This directory contains the content script implementation for the English Reading Assistant extension. The content script runs on every webpage and handles text extraction, word frequency analysis, and text selection for translation.
+本目录包含英语阅读助手扩展的内容脚本实现。内容脚本在每个网页上运行，处理文本提取、单词频率分析和文本选择翻译。
 
-## Architecture
+## 架构
 
 ```
 content/
-├── index.tsx              # Main entry point and orchestration
-├── textExtractor.ts       # Page text extraction logic
-├── selectionHandler.ts    # Text selection and translation trigger
-└── content.css           # Minimal styles for UI elements
+├── index.tsx              # 主入口和协调
+├── textExtractor.ts       # 页面文本提取逻辑
+├── selectionHandler.ts    # 文本选择和翻译触发
+└── content.css           # UI 元素的最小样式
 ```
 
-## Core Components
+## 核心组件
 
-### 1. Text Extractor (`textExtractor.ts`)
+### 1. 文本提取器 (`textExtractor.ts`)
 
-Extracts visible text content from web pages with intelligent filtering:
+从网页提取可见文本内容，并进行智能过滤：
 
-**Features:**
-- Excludes non-content elements (scripts, styles, navigation, etc.)
-- Filters out hidden elements (display: none, visibility: hidden)
-- Ignores code blocks (configurable)
-- Prioritizes main content areas (article, main tags)
-- Handles dynamic content with MutationObserver
+**功能特性：**
+- 排除非内容元素（脚本、样式、导航等）
+- 过滤隐藏元素（display: none, visibility: hidden）
+- 忽略代码块（可配置）
+- 优先处理主要内容区域（article、main 标签）
+- 使用 MutationObserver 处理动态内容
 
-**Key Functions:**
-- `extractPageText()` - Extract all visible text from page
-- `extractMainContent()` - Smart extraction focusing on main content
-- `ContentObserver` - Monitor DOM changes for SPAs
-- `shouldAnalyzePage()` - Check domain whitelist/blacklist
+**关键函数：**
+- `extractPageText()` - 从页面提取所有可见文本
+- `extractMainContent()` - 智能提取，专注于主要内容
+- `ContentObserver` - 监视 DOM 变化（用于 SPA）
+- `shouldAnalyzePage()` - 检查域名白名单/黑名单
 
-**Performance:**
-- Debounced extraction (200ms default)
-- Throttled analysis (5 seconds between runs)
-- Efficient DOM traversal
-- Viewport-aware extraction
+**性能：**
+- 防抖提取（默认 200ms）
+- 节流分析（运行间隔 5 秒）
+- 高效的 DOM 遍历
+- 视口感知提取
 
-### 2. Selection Handler (`selectionHandler.ts`)
+### 2. 选择处理器 (`selectionHandler.ts`)
 
-Handles text selection events and triggers translation:
+处理文本选择事件并触发翻译：
 
-**Features:**
-- Mouse selection detection
-- Keyboard selection support
-- Context menu integration
-- Automatic side panel opening
-- Selection validation (length, content type)
+**功能特性：**
+- 鼠标选择检测
+- 键盘选择支持
+- 上下文菜单集成
+- 自动打开侧边栏
+- 选择验证（长度、内容类型）
 
-**Key Functions:**
-- `handleSelection()` - Process text selection
-- `getSelectionContext()` - Extract surrounding context
-- `openSidePanel()` - Open translation panel
+**关键函数：**
+- `handleSelection()` - 处理文本选择
+- `getSelectionContext()` - 提取周围上下文
+- `openSidePanel()` - 打开翻译面板
 
-**Configuration:**
-- Min selection length: 1 character
-- Max selection length: 500 characters
-- Excludes input fields and editable elements
+**配置：**
+- 最小选择长度：1 个字符
+- 最大选择长度：500 个字符
+- 排除输入字段和可编辑元素
 
-### 3. Main Content Script (`index.tsx`)
+### 3. 主内容脚本 (`index.tsx`)
 
-Orchestrates all content script functionality:
+协调所有内容脚本功能：
 
-**Responsibilities:**
-- Initialize text extraction and analysis
-- Coordinate with background script
-- Store analysis results in IndexedDB
-- Update daily statistics
-- Handle settings and preferences
+**职责：**
+- 初始化文本提取和分析
+- 与后台脚本协调
+- 将分析结果存储在 IndexedDB
+- 更新每日统计
+- 处理设置和偏好
 
-**Workflow:**
-1. Check if page should be analyzed (domain whitelist/blacklist)
-2. Extract text content from page
-3. Analyze text using `textProcessor`
-4. Store word frequencies in database
-5. Update daily reading statistics
-6. Monitor DOM for dynamic content changes
+**工作流程：**
+1. 检查是否应该分析页面（域名白名单/黑名单）
+2. 从页面提取文本内容
+3. 使用 `textProcessor` 分析文本
+4. 将单词频率存储在数据库中
+5. 更新每日阅读统计
+6. 监视动态内容变化的 DOM
 
-## Data Flow
-
-```
-Page Load
-    ↓
-Check Settings (shouldAnalyzePage)
-    ↓
-Extract Text (extractMainContent)
-    ↓
-Analyze Text (analyzeText)
-    ↓
-Store Results (IndexedDB)
-    ↓
-Update Stats (readingStats)
-    ↓
-Monitor Changes (ContentObserver)
-```
-
-## Text Selection Flow
+## 数据流
 
 ```
-User Selects Text
+页面加载
+    ↓
+检查设置 (shouldAnalyzePage)
+    ↓
+提取文本 (extractMainContent)
+    ↓
+分析文本 (analyzeText)
+    ↓
+存储结果 (IndexedDB)
+    ↓
+更新统计 (readingStats)
+    ↓
+监视变化 (ContentObserver)
+```
+
+## 文本选择流程
+
+```
+用户选择文本
     ↓
 SelectionHandler.handleSelection()
     ↓
-Validate Selection
+验证选择
     ↓
-Send to Background (TRANSLATE_TEXT)
+发送到后台 (TRANSLATE_TEXT)
     ↓
-Open Side Panel
+打开侧边栏
     ↓
-Display Translation
+显示翻译
 ```
 
-## Integration with Core Modules
+## 与核心模块集成
 
-### Text Processing Pipeline
+### 文本处理管道
 
 ```typescript
-extractMainContent()  // Get raw text
+extractMainContent()  // 获取原始文本
     ↓
-cleanText()          // Normalize whitespace, punctuation
+cleanText()          // 规范化空白和标点
     ↓
-tokenize()           // Split into words
+tokenize()           // 拆分为单词
     ↓
-shouldCountWord()    // Filter stop words
+shouldCountWord()    // 过滤停用词
     ↓
-lemmatize()          // Get base form (running → run)
+lemmatize()          // 获取基本形式 (running → run)
     ↓
-analyzeText()        // Generate frequency map
+analyzeText()        // 生成频率图
 ```
 
-### Storage Integration
+### 存储集成
 
-The content script interacts with IndexedDB through the storage layer:
+内容脚本通过存储层与 IndexedDB 交互：
 
-- **Words Table**: Stores word frequencies across all pages
-- **Reading Stats**: Daily statistics (words read, domains visited)
-- **Translation Cache**: Cached translations (managed by background)
+- **Words 表**：存储所有页面的单词频率
+- **Reading Stats**：每日统计（阅读单词数、访问域名）
+- **Translation Cache**：缓存翻译（由后台管理）
 
-## Performance Optimizations
+## 性能优化
 
-1. **Debouncing**: Text extraction debounced to 200ms
-2. **Throttling**: Analysis throttled to once per 5 seconds
-3. **Batch Operations**: Bulk insert/update for database operations
-4. **Smart Filtering**: Early filtering of non-content elements
-5. **Incremental Updates**: Merge new frequencies with existing data
+1. **防抖**：文本提取防抖至 200ms
+2. **节流**：分析节流至每 5 秒一次
+3. **批量操作**：数据库操作的批量插入/更新
+4. **智能过滤**：非内容元素的早期过滤
+5. **增量更新**：将新频率与现有数据合并
 
-## Settings & Configuration
+## 设置和配置
 
-Content script respects user settings:
+内容脚本遵循用户设置：
 
-- `autoAnalysis`: Enable/disable automatic word counting
-- `blacklistDomains`: Domains to exclude from analysis
-- `whitelistDomains`: Only analyze these domains (if set)
-- `enableShortcuts`: Keyboard shortcuts for translation
+- `autoAnalysis`：启用/禁用自动单词计数
+- `blacklistDomains`：从分析中排除的域名
+- `whitelistDomains`：仅分析这些域名（如果设置）
+- `enableShortcuts`：翻译的键盘快捷键
 
-## Error Handling
+## 错误处理
 
-- Graceful degradation if analysis fails
-- Fallback to full page extraction if main content not found
-- Console logging for debugging (prefixed with `[English Reading Assistant]`)
-- Try-catch blocks around all async operations
+- 分析失败时优雅降级
+- 未找到主要内容时回退到完整页面提取
+- 用于调试的控制台日志（前缀 `[英语阅读助手]`）
+- 所有异步操作周围的 try-catch 块
 
-## Browser Compatibility
+## 浏览器兼容性
 
-- Chrome/Chromium: Full support (Manifest V3)
-- Edge: Full support
-- Firefox: Partial support (requires Manifest V2 adaptation)
-- Safari: Not supported (different extension API)
+- Chrome/Chromium：完全支持（Manifest V3）
+- Edge：完全支持
+- Firefox：部分支持（需要 Manifest V2 适配）
+- Safari：不支持（不同的扩展 API）
 
-## Testing Recommendations
+## 测试建议
 
-Test on various page types:
+在各种页面类型上测试：
 
-1. **Static Pages**: News articles, blogs
-2. **SPAs**: React/Vue/Angular apps
-3. **Dynamic Content**: Infinite scroll, lazy loading
-4. **Complex Layouts**: Multi-column, sidebars
-5. **Edge Cases**: Empty pages, code documentation, PDFs
+1. **静态页面**：新闻文章、博客
+2. **SPA**：React/Vue/Angular 应用
+3. **动态内容**：无限滚动、延迟加载
+4. **复杂布局**：多列、侧边栏
+5. **边缘情况**：空页面、代码文档、PDF
 
-## Known Limitations
+## 已知限制
 
-1. **Code Documentation**: Code blocks are excluded by default
-2. **PDFs**: Limited support (requires PDF.js integration)
-3. **Canvas/SVG Text**: Not extracted
-4. **Shadow DOM**: Limited support
-5. **iFrames**: Content not accessible due to security restrictions
+1. **代码文档**：默认排除代码块
+2. **PDF**：有限支持（需要 PDF.js 集成）
+3. **Canvas/SVG 文本**：不提取
+4. **Shadow DOM**：有限支持
+5. **iFrame**：由于安全限制无法访问内容
 
-## Future Enhancements
+## 未来改进
 
-- [ ] Configurable code block analysis
-- [ ] PDF text extraction support
-- [ ] Shadow DOM support
-- [ ] Reading progress tracking
-- [ ] Highlight difficult words on page
-- [ ] Word difficulty classification (CEFR levels)
-- [ ] Phrase detection and analysis
-- [ ] Reading speed estimation per domain
+- [ ] 可配置的代码块分析
+- [ ] PDF 文本提取支持
+- [ ] Shadow DOM 支持
+- [ ] 阅读进度追踪
+- [ ] 在页面上突出显示困难单词
+- [ ] 单词难度分类（CEFR 级别）
+- [ ] 短语检测和分析
+- [ ] 每个域名的阅读速度估计
 
-## Debugging
+## 调试
 
-Enable debug logging:
+启用调试日志：
 
 ```javascript
-// In browser console
+// 在浏览器控制台中
 localStorage.setItem('era_debug', 'true');
 ```
 
-Check content script status:
+检查内容脚本状态：
 
 ```javascript
-// In browser console
+// 在浏览器控制台中
 chrome.runtime.sendMessage({ type: 'GET_CONTENT_STATUS' });
 ```
 
-## API Reference
+## API 参考
 
 ### ContentObserver
 
@@ -236,7 +236,7 @@ class SelectionHandler {
 }
 ```
 
-### Text Extraction
+### 文本提取
 
 ```typescript
 function extractPageText(): string
@@ -245,12 +245,12 @@ function getPageMetadata(): PageMetadata
 function shouldAnalyzePage(): Promise<boolean>
 ```
 
-## Contributing
+## 贡献
 
-When modifying the content script:
+修改内容脚本时：
 
-1. Test on multiple websites
-2. Check performance impact (use Chrome DevTools Performance tab)
-3. Ensure no conflicts with page styles/scripts
-4. Update this README if adding new features
-5. Add error handling for all async operations
+1. 在多个网站上测试
+2. 检查性能影响（使用 Chrome DevTools 性能选项卡）
+3. 确保不与页面样式/脚本冲突
+4. 如果添加新功能，请更新此 README
+5. 为所有异步操作添加错误处理

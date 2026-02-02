@@ -1,140 +1,140 @@
-# Side Panel - Translation Drawer UI
+# 侧边栏 - 翻译抽屉界面
 
-## Overview
+## 概述
 
-The side panel provides a beautiful, modern translation interface that appears when users select text on any webpage. It integrates seamlessly with Chrome's native side panel API.
+侧边栏提供了一个美观、现代的翻译界面，当用户在任何网页上选择文本时显示。它与 Chrome 的原生侧边栏 API 无缝集成。
 
-## Features
+## 功能
 
-### 🎯 Core Features
+### 🎯 核心功能
 
-1. **Instant Translation Display**
-   - Clean, card-based UI showing original text and translation
-   - Supports multiple translation details (phonetics, explanations, examples)
-   - Web translations for additional context
+1. **即时翻译显示**
+   - 清晰的卡片式 UI，显示原文和翻译
+   - 支持多种翻译详情（音标、解释、示例）
+   - 网络翻译以获取额外上下文
 
-2. **Audio Pronunciation**
-   - Text-to-Speech using Web Speech API
-   - Fallback to Youdao TTS service
-   - Visual feedback during playback
+2. **音频发音**
+   - 使用 Web Speech API 的文本转语音
+   - 回退到有道 TTS 服务
+   - 播放期间的视觉反馈
 
-3. **Vocabulary Management**
-   - One-click "Add to Vocabulary" button
-   - Auto-detection of already saved words
-   - Visual confirmation when words are saved
+3. **词汇管理**
+   - 一键"添加到词汇表"按钮
+   - 自动检测已保存的单词
+   - 保存单词时的视觉确认
 
-4. **User Experience**
-   - Empty state with helpful instructions
-   - Loading states with spinner
-   - Error handling with retry option
-   - Copy translation to clipboard
-   - Smooth animations and transitions
+4. **用户体验**
+   - 带有帮助说明的空状态
+   - 带加载器的加载状态
+   - 带重试选项的错误处理
+   - 复制翻译到剪贴板
+   - 平滑的动画和过渡
 
-### 🎨 UI Components
+### 🎨 UI 组件
 
-#### Empty State
-Shows when no text is selected, with:
-- Icon and welcome message
-- Usage instructions
-- Keyboard shortcut hints
+#### 空状态
+未选择文本时显示，包含：
+- 图标和欢迎消息
+- 使用说明
+- 键盘快捷键提示
 
-#### Translation View
-Main content area showing:
-- Original text card with pronunciation button
-- Translation card with copy button
-- Detailed explanations list
-- Example sentences
-- Web translations
+#### 翻译视图
+显示的主要内容区域：
+- 带发音按钮的原文卡片
+- 带复制按钮的翻译卡片
+- 详细解释列表
+- 例句
+- 网络翻译
 
-#### Action Footer
-Fixed footer with:
-- "Add to Vocabulary" button
-- Status indication (saved/unsaved)
+#### 操作页脚
+固定页脚包含：
+- "添加到词汇表"按钮
+- 状态指示（已保存/未保存）
 
-## Architecture
+## 架构
 
 ```
 sidepanel/
-├── sidepanel.html       # Entry HTML file
-├── index.tsx            # React initialization
-├── App.tsx              # Main app container & message handling
-├── TranslationView.tsx  # Core translation UI component
-├── sidepanel.css        # Custom styles
-└── README.md            # This file
+├── sidepanel.html       # 入口 HTML 文件
+├── index.tsx            # React 初始化
+├── App.tsx              # 主应用容器和消息处理
+├── TranslationView.tsx  # 核心翻译 UI 组件
+├── sidepanel.css        # 自定义样式
+└── README.md            # 本文件
 ```
 
-## Message Flow
+## 消息流
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant Content
-    participant Background
-    participant SidePanel
-    
-    User->>Content: Selects text
-    Content->>Background: TRANSLATE_TEXT message
-    Background->>Background: Fetch/cache translation
-    Background->>SidePanel: TRANSLATION_RESULT message
-    SidePanel->>User: Display translation
-    User->>SidePanel: Add to vocabulary
-    SidePanel->>Background: SAVE_VOCABULARY message
+```
+用户 → 选择文本
+    ↓
+内容脚本 → 后台
+    ↓
+后台 → 获取/缓存翻译
+    ↓
+后台 → 侧边栏（TRANSLATION_RESULT 消息）
+    ↓
+侧边栏 → 用户（显示翻译）
+    ↓
+用户 → 侧边栏（添加到词汇表）
+    ↓
+侧边栏 → 后台（SAVE_VOCABULARY 消息）
 ```
 
-## State Management
+## 状态管理
 
-The App component manages:
-- `selectedText`: Currently selected text
-- `translation`: Translation result from API
-- `isLoading`: Loading state
-- `error`: Error message if translation fails
+App 组件管理：
+- `selectedText`：当前选择的文本
+- `translation`：来自 API 的翻译结果
+- `isLoading`：加载状态
+- `error`：翻译失败时的错误消息
 
-## Styling
+## 样式
 
-- Uses Tailwind CSS for utility classes
-- Custom CSS variables for theming (light/dark mode)
-- Smooth animations for card appearances
-- Custom scrollbar styling
-- Responsive design for different side panel widths
+- 使用 Tailwind CSS 实用类
+- 用于主题（浅色/深色模式）的自定义 CSS 变量
+- 卡片出现的平滑动画
+- 自定义滚动条样式
+- 不同侧边栏宽度的响应式设计
 
-## Integration Points
+## 集成点
 
-### Chrome APIs Used
-- `chrome.runtime.onMessage` - Receive translation results
-- `chrome.storage.local` - Persist pending translations
+### 使用的 Chrome API
+- `chrome.runtime.onMessage` - 接收翻译结果
+- `chrome.storage.local` - 持久化待处理翻译
 
-### Internal Dependencies
-- `storage/db.ts` - IndexedDB interfaces
-- `storage/vocabularyRepository.ts` - Vocabulary CRUD operations
-- `utils/messaging.ts` - Type-safe Chrome messaging
+### 内部依赖
+- `storage/db.ts` - IndexedDB 接口
+- `storage/vocabularyRepository.ts` - 词汇 CRUD 操作
+- `utils/messaging.ts` - 类型安全的 Chrome 消息
 
-## Development
+## 开发
 
-### Adding New Features
+### 添加新功能
 
-1. **Add new card type**: Create a new section in `TranslationView.tsx`
-2. **Add new action**: Add button in footer and handler function
-3. **Add new message type**: Update `utils/messaging.ts` and handle in `App.tsx`
+1. **添加新卡片类型**：在 `TranslationView.tsx` 中创建新部分
+2. **添加新操作**：在页脚添加按钮和处理函数
+3. **添加新消息类型**：更新 `utils/messaging.ts` 并在 `App.tsx` 中处理
 
-### Testing
+### 测试
 
-Test scenarios:
-- Select single word
-- Select phrase/sentence
-- Select text with no translation available
-- Test audio playback
-- Test vocabulary save
-- Test clipboard copy
-- Test error states
-- Test loading states
-- Test dark mode
+测试场景：
+- 选择单个单词
+- 选择短语/句子
+- 选择无可用翻译的文本
+- 测试音频播放
+- 测试词汇保存
+- 测试剪贴板复制
+- 测试错误状态
+- 测试加载状态
+- 测试深色模式
 
-## Future Enhancements
+## 未来改进
 
-- [ ] Word difficulty level badge (CEFR: A1-C2)
-- [ ] Inline tags for vocabulary items
-- [ ] History of recent translations
-- [ ] Search within side panel
-- [ ] Customizable UI settings (font size, colors)
-- [ ] Quick actions (search in dictionary, web search)
-- [ ] Spaced repetition reminders
+- [ ] 单词难度级别徽章（CEFR：A1-C2）
+- [ ] 词汇项目的内联标签
+- [ ] 最近翻译的历史记录
+- [ ] 侧边栏内搜索
+- [ ] 可自定义的 UI 设置（字体大小、颜色）
+- [ ] 快速操作（在词典中搜索、网络搜索）
+- [ ] 间隔重复提醒

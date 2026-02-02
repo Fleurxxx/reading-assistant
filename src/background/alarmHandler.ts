@@ -2,50 +2,50 @@ import { cleanExpiredCache, db, getTodayDateString } from "../storage/db";
 import { STATS_RETENTION_DAYS } from "../utils/constants";
 
 /**
- * Alarm handler for periodic background tasks
- * Manages scheduled operations like cache cleanup and stats maintenance
+ * 定期后台任务的定时任务处理器
+ * 管理定时操作，如缓存清理和统计维护
  */
 export class AlarmHandler {
   /**
-   * Setup all alarms
+   * 设置所有定时任务
    */
   setupAlarms(): void {
-    // Daily stats reset alarm (runs at midnight)
+    // 每日统计重置定时任务（在午夜运行）
     chrome.alarms.create("daily-reset", {
       when: this.getNextMidnight(),
-      periodInMinutes: 24 * 60, // 24 hours
+      periodInMinutes: 24 * 60, // 24 小时
     });
 
-    // Cache cleanup alarm (runs every hour)
+    // 缓存清理定时任务（每小时运行）
     chrome.alarms.create("cache-cleanup", {
       periodInMinutes: 60,
     });
 
-    // Stats cleanup alarm (runs daily to remove old stats)
+    // 统计清理定时任务（每天运行以删除旧统计）
     chrome.alarms.create("stats-cleanup", {
-      when: this.getNextMidnight() + 60 * 60 * 1000, // 1 hour after midnight
+      when: this.getNextMidnight() + 60 * 60 * 1000, // 午夜后 1 小时
       periodInMinutes: 24 * 60,
     });
 
-    // Backup reminder alarm (runs weekly)
+    // 备份提醒定时任务（每周运行）
     chrome.alarms.create("backup-reminder", {
       when: this.getNextSunday(),
-      periodInMinutes: 7 * 24 * 60, // 1 week
+      periodInMinutes: 7 * 24 * 60, // 1 周
     });
 
-    // Listen to alarm events
+    // 监听定时任务事件
     chrome.alarms.onAlarm.addListener((alarm) => {
       this.handleAlarm(alarm);
     });
 
-    console.log("[AlarmHandler] All alarms configured");
+    console.log("[定时任务处理器] 所有定时任务已配置");
   }
 
   /**
-   * Handle alarm events
+   * 处理定时任务事件
    */
   private async handleAlarm(alarm: chrome.alarms.Alarm): Promise<void> {
-    console.log("[AlarmHandler] Alarm triggered:", alarm.name);
+    console.log("[定时任务处理器] 定时任务触发:", alarm.name);
 
     try {
       switch (alarm.name) {
@@ -66,34 +66,34 @@ export class AlarmHandler {
           break;
 
         default:
-          console.warn("[AlarmHandler] Unknown alarm:", alarm.name);
+          console.warn("[定时任务处理器] 未知定时任务:", alarm.name);
       }
     } catch (error) {
-      console.error("[AlarmHandler] Error handling alarm:", alarm.name, error);
+      console.error("[定时任务处理器] 处理定时任务错误:", alarm.name, error);
     }
   }
 
   /**
-   * Handle daily reset
+   * 处理每日重置
    */
   private async handleDailyReset(): Promise<void> {
-    console.log("[AlarmHandler] Daily reset triggered");
+    console.log("[定时任务处理器] 每日重置已触发");
 
-    // Stats are automatically managed by date-based keys
-    // This is mainly for logging and potential future functionality
+    // 统计由基于日期的键自动管理
+    // 这主要用于日志记录和潜在的未来功能
 
     const today = getTodayDateString();
     const stats = await db.readingStats.get(today);
 
     if (stats) {
-      console.log("[AlarmHandler] Previous day stats:", {
+      console.log("[定时任务处理器] 前一天统计:", {
         words: stats.wordsCount,
         translations: stats.translationCount,
         domains: stats.domainsVisited.length,
       });
     }
 
-    // Create today's entry if it doesn't exist
+    // 如果不存在，则创建今天的条目
     const todayStats = await db.readingStats.get(today);
     if (!todayStats) {
       await db.readingStats.add({
@@ -104,22 +104,22 @@ export class AlarmHandler {
         translationCount: 0,
         readingTime: 0,
       });
-      console.log("[AlarmHandler] Created new stats entry for today");
+      console.log("[定时任务处理器] 已为今天创建新的统计条目");
     }
   }
 
   /**
-   * Handle cache cleanup
+   * 处理缓存清理
    */
   private async handleCacheCleanup(): Promise<void> {
     try {
       const cleaned = await cleanExpiredCache();
 
       if (cleaned > 0) {
-        console.log(`[AlarmHandler] Cleaned ${cleaned} expired cache entries`);
+        console.log(`[定时任务处理器] 清理了 ${cleaned} 个过期缓存条目`);
       }
 
-      // Also check cache size and clean oldest entries if too large
+      // 同时检查缓存大小，如果太大则清理最旧的条目
       const cacheCount = await db.translationCache.count();
       const maxCacheSize = 1000;
 
@@ -132,16 +132,16 @@ export class AlarmHandler {
 
         await db.translationCache.bulkDelete(oldestEntries.map((e) => e.text));
         console.log(
-          `[AlarmHandler] Removed ${toDelete} oldest cache entries to maintain size limit`
+          `[定时任务处理器] 删除了 ${toDelete} 个最旧的缓存条目以保持大小限制`
         );
       }
     } catch (error) {
-      console.error("[AlarmHandler] Cache cleanup error:", error);
+      console.error("[定时任务处理器] 缓存清理错误:", error);
     }
   }
 
   /**
-   * Handle stats cleanup (remove old statistics)
+   * 处理统计清理（删除旧统计数据）
    */
   private async handleStatsCleanup(): Promise<void> {
     try {
@@ -149,52 +149,52 @@ export class AlarmHandler {
       cutoffDate.setDate(cutoffDate.getDate() - STATS_RETENTION_DAYS);
       const cutoffDateString = cutoffDate.toISOString().split("T")[0];
 
-      // Get all stats older than retention period
+      // 获取所有早于保留期的统计
       const oldStats = await db.readingStats.where("date").below(cutoffDateString).toArray();
 
       if (oldStats.length > 0) {
         await db.readingStats.bulkDelete(oldStats.map((s) => s.date));
         console.log(
-          `[AlarmHandler] Removed ${oldStats.length} old stats entries (older than ${STATS_RETENTION_DAYS} days)`
+          `[定时任务处理器] 删除了 ${oldStats.length} 个旧统计条目（早于 ${STATS_RETENTION_DAYS} 天）`
         );
       }
     } catch (error) {
-      console.error("[AlarmHandler] Stats cleanup error:", error);
+      console.error("[定时任务处理器] 统计清理错误:", error);
     }
   }
 
   /**
-   * Handle backup reminder
+   * 处理备份提醒
    */
   private async handleBackupReminder(): Promise<void> {
     try {
-      // Get vocabulary count
+      // 获取词汇数量
       const vocabCount = await db.vocabulary.count();
 
       if (vocabCount > 0) {
-        // Show a notification reminder (if user has granted permission)
+        // 显示提醒通知（如果用户已授予权限）
         try {
           await chrome.notifications.create({
             type: "basic",
             iconUrl: chrome.runtime.getURL("icons/icon128.svg"),
-            title: "English Reading Assistant",
-            message: `You have ${vocabCount} words in your vocabulary. Don't forget to backup your data!`,
+            title: "英语阅读助手",
+            message: `您的词汇表中有 ${vocabCount} 个单词。别忘了备份您的数据！`,
             priority: 1,
           });
 
-          console.log("[AlarmHandler] Backup reminder notification sent");
+          console.log("[定时任务处理器] 备份提醒通知已发送");
         } catch (error) {
-          // Notifications might not be enabled
-          console.debug("[AlarmHandler] Could not send notification:", error);
+          // 通知可能未启用
+          console.debug("[定时任务处理器] 无法发送通知:", error);
         }
       }
     } catch (error) {
-      console.error("[AlarmHandler] Backup reminder error:", error);
+      console.error("[定时任务处理器] 备份提醒错误:", error);
     }
   }
 
   /**
-   * Get timestamp for next midnight
+   * 获取下一个午夜的时间戳
    */
   private getNextMidnight(): number {
     const now = new Date();
@@ -203,7 +203,7 @@ export class AlarmHandler {
   }
 
   /**
-   * Get timestamp for next Sunday at noon
+   * 获取下一个周日中午的时间戳
    */
   private getNextSunday(): number {
     const now = new Date();
@@ -212,7 +212,7 @@ export class AlarmHandler {
       now.getFullYear(),
       now.getMonth(),
       now.getDate() + daysUntilSunday,
-      12, // noon
+      12, // 中午
       0,
       0
     );
@@ -220,20 +220,20 @@ export class AlarmHandler {
   }
 
   /**
-   * Clear all alarms (for cleanup)
+   * 清除所有定时任务（用于清理）
    */
   async clearAllAlarms(): Promise<void> {
     await chrome.alarms.clearAll();
-    console.log("[AlarmHandler] All alarms cleared");
+    console.log("[定时任务处理器] 所有定时任务已清除");
   }
 
   /**
-   * Get information about active alarms
+   * 获取有关活动定时任务的信息
    */
   async getAlarmInfo(): Promise<chrome.alarms.Alarm[]> {
     return await chrome.alarms.getAll();
   }
 }
 
-// Export singleton instance
+// 导出单例实例
 export const alarmHandler = new AlarmHandler();

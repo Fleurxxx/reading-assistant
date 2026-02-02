@@ -3,8 +3,8 @@ import { alarmHandler } from "./alarmHandler";
 import { messageHandler } from "./messageHandler";
 
 /**
- * Background service worker
- * Coordinates extension operations and handles messages
+ * 后台服务工作线程
+ * 协调扩展操作并处理消息
  */
 class BackgroundService {
   constructor() {
@@ -12,29 +12,29 @@ class BackgroundService {
   }
 
   /**
-   * Initialize background service
+   * 初始化后台服务
    */
   private init(): void {
-    console.log("[English Reading Assistant] Background service initialized");
+    console.log("[英语阅读助手] 后台服务已初始化");
 
-    // Setup message listeners
+    // 设置消息监听器
     this.setupMessageListeners();
 
-    // Setup context menu
+    // 设置上下文菜单
     this.setupContextMenu();
 
-    // Setup alarms for daily stats reset
+    // 设置每日统计重置定时任务
     alarmHandler.setupAlarms();
 
-    // Setup command listeners
+    // 设置快捷键命令监听器
     this.setupCommands();
 
-    // Setup installation and update handlers
+    // 设置安装和更新处理器
     this.setupInstallationHandlers();
   }
 
   /**
-   * Setup message listeners
+   * 设置消息监听器
    */
   private setupMessageListeners(): void {
     addMessageListener(async (message, sender) => {
@@ -64,55 +64,55 @@ class BackgroundService {
           return await messageHandler.handleBatchWordUpdate(message.data);
 
         default:
-          console.warn("[Background] Unknown message type:", message.type);
-          return { success: false, error: "Unknown message type" };
+          console.warn("[后台] 未知消息类型:", message.type);
+          return { success: false, error: "未知消息类型" };
       }
     });
   }
 
   /**
-   * Setup context menu
+   * 设置上下文菜单
    */
   private setupContextMenu(): void {
     chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       if (info.menuItemId === "translate-selection" && info.selectionText && tab?.id) {
         try {
-          // Send translation request through message handler
+          // 通过消息处理器发送翻译请求
           const sender = { tab };
           await messageHandler.handleTranslation(
             { text: info.selectionText },
             sender as chrome.runtime.MessageSender
           );
 
-          // Open side panel
+          // 打开侧边栏
           await chrome.sidePanel.open({ tabId: tab.id });
         } catch (error) {
-          console.error("[Background] Context menu translation error:", error);
+          console.error("[后台] 上下文菜单翻译错误:", error);
         }
       }
     });
   }
 
   /**
-   * Setup installation and update handlers
+   * 设置安装和更新处理器
    */
   private setupInstallationHandlers(): void {
     chrome.runtime.onInstalled.addListener(async (details) => {
-      console.log("[Background] Extension installed/updated:", details.reason);
+      console.log("[后台] 扩展已安装/更新:", details.reason);
 
-      // Create context menu
+      // 创建上下文菜单
       try {
         await chrome.contextMenus.create({
           id: "translate-selection",
-          title: 'Translate "%s"',
+          title: '翻译 "%s"',
           contexts: ["selection"],
         });
-        console.log("[Background] Context menu created");
+        console.log("[后台] 上下文菜单已创建");
       } catch (error) {
-        console.error("[Background] Error creating context menu:", error);
+        console.error("[后台] 创建上下文菜单错误:", error);
       }
 
-      // Handle different installation reasons
+      // 处理不同的安装原因
       if (details.reason === "install") {
         await this.handleFirstInstall();
       } else if (details.reason === "update") {
@@ -122,17 +122,17 @@ class BackgroundService {
   }
 
   /**
-   * Handle first installation
+   * 处理首次安装
    */
   private async handleFirstInstall(): Promise<void> {
-    console.log("[Background] First installation detected");
+    console.log("[后台] 检测到首次安装");
 
     try {
-      // Set default settings if not present
+      // 如果不存在，则设置默认设置
       const { era_settings } = await chrome.storage.local.get("era_settings");
 
       if (!era_settings) {
-        // Define default settings inline to avoid module loading issues in service worker
+        // 在服务工作线程中内联定义默认设置以避免模块加载问题
         const DEFAULT_SETTINGS = {
           autoAnalysis: true,
           blacklistDomains: [],
@@ -143,72 +143,72 @@ class BackgroundService {
           enableShortcuts: true,
         };
         await chrome.storage.local.set({ era_settings: DEFAULT_SETTINGS });
-        console.log("[Background] Default settings initialized");
+        console.log("[后台] 默认设置已初始化");
       }
 
-      // Show welcome notification
+      // 显示欢迎通知
       try {
         await chrome.notifications.create({
           type: "basic",
           iconUrl: chrome.runtime.getURL("icons/icon128.svg"),
-          title: "Welcome to English Reading Assistant!",
-          message: "Select any text to translate. Configure API keys in settings.",
+          title: "欢迎使用英语阅读助手！",
+          message: "选择任意文本进行翻译。在设置中配置 API 密钥。",
           priority: 2,
         });
       } catch (error) {
-        console.debug("[Background] Could not show welcome notification:", error);
+        console.debug("[后台] 无法显示欢迎通知:", error);
       }
 
-      // Open options page on first install
+      // 首次安装时打开选项页面
       chrome.runtime.openOptionsPage();
     } catch (error) {
-      console.error("[Background] Error during first install:", error);
+      console.error("[后台] 首次安装时发生错误:", error);
     }
   }
 
   /**
-   * Handle extension update
+   * 处理扩展更新
    */
   private async handleUpdate(previousVersion?: string): Promise<void> {
-    console.log("[Background] Extension updated from version:", previousVersion);
+    console.log("[后台] 扩展已从版本更新:", previousVersion);
 
-    // Perform any migration tasks here if needed
-    // For example, updating database schema, settings format, etc.
+    // 如果需要，在此执行任何迁移任务
+    // 例如，更新数据库架构、设置格式等。
   }
 
   /**
-   * Setup keyboard commands
+   * 设置键盘快捷键
    */
   private setupCommands(): void {
     chrome.commands.onCommand.addListener(async (command) => {
       if (command === "translate-selection") {
         try {
-          // Get active tab
+          // 获取活动标签页
           const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
           if (!tab?.id) {
-            console.warn("[Background] No active tab for command");
+            console.warn("[后台] 命令没有活动标签页");
             return;
           }
 
-          // Send message to content script to get and translate selection
+          // 向内容脚本发送消息以获取和翻译选择
           await chrome.tabs.sendMessage(tab.id, {
             type: "TRANSLATE_CURRENT_SELECTION",
           });
 
-          // Open side panel
+          // 打开侧边栏
           await chrome.sidePanel.open({ tabId: tab.id });
         } catch (error) {
-          console.error("[Background] Command error:", error);
+          console.error("[后台] 命令错误:", error);
         }
       }
     });
   }
 }
 
-// Initialize background service
+// 初始化后台服务
 const backgroundService = new BackgroundService();
 
-// Export for testing
+// 导出用于测试
 export default BackgroundService;
 export { backgroundService };

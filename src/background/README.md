@@ -1,183 +1,183 @@
-# Background Service Worker
+# 后台服务工作线程 (Background Service Worker)
 
-The background service worker is the heart of the English Reading Assistant extension, coordinating all operations and managing communication between different components.
+后台服务工作线程是英语阅读助手扩展的核心，协调所有操作并管理不同组件之间的通信。
 
-## Architecture
+## 架构设计
 
-The background worker is organized into modular components:
+后台工作线程采用模块化组织：
 
-### Main Components
+### 主要组件
 
-1. **index.ts** - Main service worker entry point
-   - Initializes all handlers and listeners
-   - Sets up context menus and keyboard commands
-   - Manages installation and update events
+1. **index.ts** - 主要服务工作线程入口
+   - 初始化所有处理器和监听器
+   - 设置上下文菜单和键盘快捷键
+   - 管理安装和更新事件
 
-2. **messageHandler.ts** - Message processing
-   - Handles all incoming messages from content scripts and UI
-   - Processes translation requests
-   - Manages vocabulary and settings operations
-   - Batch word updates for performance
+2. **messageHandler.ts** - 消息处理
+   - 处理来自内容脚本和 UI 的所有消息
+   - 处理翻译请求
+   - 管理词汇和设置操作
+   - 批量更新单词以提升性能
 
-3. **alarmHandler.ts** - Scheduled tasks
-   - Daily stats reset (midnight)
-   - Cache cleanup (hourly)
-   - Stats cleanup (daily)
-   - Backup reminders (weekly)
+3. **alarmHandler.ts** - 定时任务
+   - 每日统计重置（午夜）
+   - 缓存清理（每小时）
+   - 统计数据清理（每天）
+   - 备份提醒（每周）
 
-## Message Types
+## 消息类型
 
-The service worker handles the following message types:
+服务工作线程处理以下消息类型：
 
-### Translation & Content
-- `TRANSLATE_TEXT` - Translate selected text
-- `EXTRACT_TEXT` - Process extracted text from pages
-- `BATCH_WORD_UPDATE` - Batch update word statistics
+### 翻译与内容
+- `TRANSLATE_TEXT` - 翻译选中的文本
+- `EXTRACT_TEXT` - 处理从页面提取的文本
+- `BATCH_WORD_UPDATE` - 批量更新单词统计
 
-### Vocabulary
-- `SAVE_VOCABULARY` - Add word to vocabulary collection
+### 词汇管理
+- `SAVE_VOCABULARY` - 添加单词到词汇集合
 
-### Settings
-- `GET_SETTINGS` - Retrieve current settings
-- `UPDATE_SETTINGS` - Update settings and broadcast to tabs
+### 设置
+- `GET_SETTINGS` - 获取当前设置
+- `UPDATE_SETTINGS` - 更新设置并广播到所有标签页
 
-### UI Control
-- `OPEN_SIDE_PANEL` - Open translation side panel
-- `GET_SELECTION` - Request current text selection
+### UI 控制
+- `OPEN_SIDE_PANEL` - 打开翻译侧边栏
+- `GET_SELECTION` - 请求当前文本选择
 
-## Features
+## 功能特性
 
-### Context Menu Integration
-- Right-click selected text to translate
-- Automatically opens side panel with results
+### 上下文菜单集成
+- 右键点击选中文本进行翻译
+- 自动打开侧边栏显示结果
 
-### Keyboard Shortcuts
+### 键盘快捷键
 - `Ctrl+Shift+T` (Windows/Linux) / `Cmd+Shift+T` (Mac)
-- Translates current selection instantly
+- 立即翻译当前选中内容
 
-### Scheduled Tasks
+### 定时任务
 
-#### Hourly Tasks
-- Clean expired translation cache
-- Maintain cache size limits (max 1000 entries)
+#### 每小时任务
+- 清理过期的翻译缓存
+- 维护缓存大小限制（最多 1000 条）
 
-#### Daily Tasks (Midnight)
-- Initialize new daily stats entry
-- Clean old statistics (>90 days)
-- Log previous day's reading activity
+#### 每日任务（午夜）
+- 初始化新的每日统计条目
+- 清理旧统计数据（>90 天）
+- 记录前一天的阅读活动
 
-#### Weekly Tasks (Sunday)
-- Send backup reminder notification
-- Encourage vocabulary export
+#### 每周任务（周日）
+- 发送备份提醒通知
+- 鼓励导出词汇
 
-### Installation & Updates
+### 安装与更新
 
-#### First Install
-- Initialize default settings
-- Show welcome notification
-- Open options page for API configuration
+#### 首次安装
+- 初始化默认设置
+- 显示欢迎通知
+- 打开选项页面配置 API
 
-#### Updates
-- Perform migration tasks if needed
-- Log version changes
+#### 更新
+- 执行必要的迁移任务
+- 记录版本变更
 
-## Performance Optimizations
+## 性能优化
 
-### Batch Processing
-- Word updates processed in batches of 50
-- Prevents blocking on large text analysis
+### 批处理
+- 单词更新以 50 个为一批处理
+- 防止大文本分析时阻塞
 
-### Efficient Caching
-- Translation results cached in IndexedDB
-- Automatic cleanup of expired/old entries
-- Size-based eviction (LRU strategy)
+### 高效缓存
+- 翻译结果缓存在 IndexedDB
+- 自动清理过期/旧条目
+- 基于大小的驱逐策略（LRU）
 
-### Error Handling
-- Graceful degradation on failures
-- Detailed logging for debugging
-- User-friendly error messages
+### 错误处理
+- 失败时优雅降级
+- 详细日志记录用于调试
+- 用户友好的错误消息
 
-### Message Broadcasting
-- Settings updates broadcast to all tabs
-- Ensures consistent behavior across extension
+### 消息广播
+- 设置更新广播到所有标签页
+- 确保扩展行为一致
 
-## Data Flow
+## 数据流
 
-### Translation Request Flow
+### 翻译请求流程
 ```
-Content Script → Background → Translation Service → Cache/API
-                    ↓
-              Side Panel (Result Display)
-                    ↓
-              Stats Update (IndexedDB)
-```
-
-### Text Analysis Flow
-```
-Content Script → Text Extraction → Background → Word Processing
-                                        ↓
-                                  Batch Update → IndexedDB
-                                        ↓
-                                  Stats Aggregation
+内容脚本 → 后台 → 翻译服务 → 缓存/API
+            ↓
+        侧边栏（显示结果）
+            ↓
+        统计更新（IndexedDB）
 ```
 
-### Settings Flow
+### 文本分析流程
 ```
-Options Page → Background → chrome.storage.local
-                  ↓
-            Broadcast to All Tabs → Content Scripts
+内容脚本 → 文本提取 → 后台 → 单词处理
+                            ↓
+                        批量更新 → IndexedDB
+                            ↓
+                        统计聚合
 ```
 
-## Security & Privacy
+### 设置流程
+```
+选项页面 → 后台 → chrome.storage.local
+              ↓
+        广播到所有标签页 → 内容脚本
+```
 
-### Data Handling
-- Only selected text sent to translation API
-- Full page content stays local
-- API credentials stored in chrome.storage.local
+## 安全与隐私
 
-### Permissions
-- Minimal permission requests
-- No external tracking or analytics
-- All data stored locally
+### 数据处理
+- 只有选中的文本会发送到翻译 API
+- 完整页面内容保留在本地
+- API 凭据存储在 chrome.storage.local
 
-## Testing Considerations
+### 权限
+- 最小化权限请求
+- 无外部追踪或分析
+- 所有数据本地存储
 
-### Message Handler Testing
-- Test each message type with valid/invalid data
-- Verify error handling and responses
-- Check concurrent request handling
+## 测试考虑
 
-### Alarm Testing
-- Verify alarm creation and firing
-- Test cleanup operations don't corrupt data
-- Check notification permissions handling
+### 消息处理器测试
+- 使用有效/无效数据测试每种消息类型
+- 验证错误处理和响应
+- 检查并发请求处理
 
-### Installation Testing
-- Test fresh install flow
-- Verify update migration
-- Check default settings initialization
+### 定时任务测试
+- 验证定时任务的创建和触发
+- 测试清理操作不会损坏数据
+- 检查通知权限处理
 
-## Debugging
+### 安装测试
+- 测试全新安装流程
+- 验证更新迁移
+- 检查默认设置初始化
 
-### Enable Detailed Logging
-The service worker includes comprehensive logging:
-- `[Background]` - Main service events
-- `[MessageHandler]` - Message processing
-- `[AlarmHandler]` - Scheduled tasks
+## 调试
 
-### View Service Worker
-1. Go to `chrome://extensions`
-2. Enable Developer Mode
-3. Click "Service Worker" under extension
-4. View console logs
+### 启用详细日志
+服务工作线程包含全面的日志记录：
+- `[Background]` - 主要服务事件
+- `[MessageHandler]` - 消息处理
+- `[AlarmHandler]` - 定时任务
 
-### Inspect Messages
-All messages logged with type and data for debugging.
+### 查看服务工作线程
+1. 访问 `chrome://extensions`
+2. 启用开发者模式
+3. 点击扩展下方的"Service Worker"
+4. 查看控制台日志
 
-## Future Enhancements
+### 检查消息
+所有消息都会记录类型和数据用于调试。
 
-- [ ] Add support for offline mode
-- [ ] Implement request queuing for rate limiting
-- [ ] Add analytics for usage patterns (opt-in)
-- [ ] Cloud sync support for vocabulary
-- [ ] Advanced error recovery and retry logic
+## 未来改进
+
+- [ ] 添加离线模式支持
+- [ ] 实现请求队列以进行速率限制
+- [ ] 添加使用模式分析（可选）
+- [ ] 词汇云同步支持
+- [ ] 高级错误恢复和重试逻辑

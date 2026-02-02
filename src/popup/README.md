@@ -1,103 +1,103 @@
-# Popup Statistics Dashboard
+# 弹窗统计面板
 
-## Overview
+## 概述
 
-The popup provides a comprehensive statistics dashboard that displays reading analytics, word frequency data, and vocabulary metrics when users click the extension icon.
+弹窗提供了一个全面的统计面板，当用户点击扩展图标时显示阅读分析、单词频率数据和词汇指标。
 
-## Files
+## 文件
 
-- **popup.html** - HTML entry point for the popup
-- **index.tsx** - React root component initialization
-- **StatsView.tsx** - Main statistics dashboard component
+- **popup.html** - 弹窗的 HTML 入口点
+- **index.tsx** - React 根组件初始化
+- **StatsView.tsx** - 主统计面板组件
 
-## Features
+## 功能
 
-### 1. Today's Statistics Cards
-- **Words Today**: Total words read today
-- **Translations**: Number of translations performed
-- **Sites Visited**: Unique domains visited
-- **Reading Time**: Estimated reading time in minutes
+### 1. 今日统计卡片
+- **今日单词数**：今天阅读的总单词数
+- **翻译次数**：执行的翻译次数
+- **访问网站**：访问的唯一域名
+- **阅读时间**：估计的阅读时间（分钟）
 
-### 2. All-Time Statistics
-Displayed when user has more than 1 day of data:
-- Total words read across all sessions
-- Total days active
-- Total translations performed
-- Total reading time
+### 2. 全部统计
+当用户有超过 1 天的数据时显示：
+- 所有会话中阅读的总单词数
+- 总活跃天数
+- 执行的总翻译次数
+- 总阅读时间
 
-### 3. Top 10 Words Chart
-- Bar chart showing the most frequently encountered words
-- Uses Chart.js for visualization
-- Interactive tooltips with word frequency
+### 3. 前 10 个单词图表
+- 显示最常遇到的单词的条形图
+- 使用 Chart.js 进行可视化
+- 带单词频率的交互式工具提示
 
-### 4. 7-Day Trend Chart
-- Line chart showing reading activity over the past week
-- Two datasets:
-  - Words Read (blue line)
-  - Translations (purple line)
-- Helps users track their reading consistency
+### 4. 7 天趋势图表
+- 显示过去一周阅读活动的折线图
+- 两个数据集：
+  - 阅读单词数（蓝线）
+  - 翻译次数（紫线）
+- 帮助用户追踪阅读一致性
 
-### 5. Vocabulary Collection
-- Displays total number of saved vocabulary words
-- Quick access button to view full vocabulary list
-- Opens the options page when clicked
+### 5. 词汇集合
+- 显示已保存词汇单词的总数
+- 快速访问按钮查看完整词汇列表
+- 点击时打开选项页面
 
-### 6. Quick Actions
-- **Open Translation Panel**: Opens the side panel for translations
-- **Refresh**: Reload statistics data
+### 6. 快速操作
+- **打开翻译面板**：打开侧边栏进行翻译
+- **刷新**：重新加载统计数据
 
-## Data Sources
+## 数据来源
 
-The popup pulls data from multiple repositories:
+弹窗从多个存储库提取数据：
 
-- `statsRepository.getTodayStats()` - Today's reading statistics
-- `statsRepository.getRecentStats(7)` - Last 7 days of data
-- `statsRepository.getAllTimeStats()` - Cumulative statistics
-- `wordRepository.getTopWords(10)` - Most frequent words
-- `db.vocabulary.count()` - Total saved vocabulary
+- `statsRepository.getTodayStats()` - 今日阅读统计
+- `statsRepository.getRecentStats(7)` - 最近 7 天的数据
+- `statsRepository.getAllTimeStats()` - 累计统计
+- `wordRepository.getTopWords(10)` - 最常见的单词
+- `db.vocabulary.count()` - 总保存词汇
 
-## Design
+## 设计
 
-- **Width**: 400px
-- **Max Height**: 600px with scrolling
-- **Theme**: Supports light and dark mode via Tailwind
-- **Colors**:
-  - Primary: Sky blue (#0ea5e9)
-  - Secondary colors: Purple, Green, Orange for different metrics
-- **Icons**: Lucide React icons for visual elements
+- **宽度**：400px
+- **最大高度**：600px 带滚动
+- **主题**：通过 Tailwind 支持浅色和深色模式
+- **颜色**：
+  - 主色：天蓝色 (#0ea5e9)
+  - 不同指标的次要颜色：紫色、绿色、橙色
+- **图标**：Lucide React 图标用于视觉元素
 
-## User Experience
+## 用户体验
 
-### Loading State
-- Displays a spinner with "Loading statistics..." message
-- Ensures smooth user experience while data loads
+### 加载状态
+- 显示带有"加载统计..."消息的加载器
+- 确保数据加载时的流畅用户体验
 
-### Error State
-- Shows error message with retry button
-- Handles database access failures gracefully
+### 错误状态
+- 显示带重试按钮的错误消息
+- 优雅地处理数据库访问失败
 
-### Empty State
-- Works correctly even with no data
-- Shows 0 values and empty charts
+### 空状态
+- 即使没有数据也能正常工作
+- 显示 0 值和空图表
 
-## Performance
+## 性能
 
-- All data fetching happens in parallel using `Promise.all`
-- Efficient IndexedDB queries using Dexie
-- Charts are rendered only when data is available
-- Minimal re-renders with React hooks
+- 所有数据获取使用 `Promise.all` 并行进行
+- 使用 Dexie 进行高效的 IndexedDB 查询
+- 仅在数据可用时渲染图表
+- 使用 React hooks 最小化重新渲染
 
-## Browser API Usage
+## 浏览器 API 使用
 
-- `chrome.runtime.openOptionsPage()` - Opens vocabulary management
-- `chrome.tabs.query()` - Gets active tab
-- `chrome.sidePanel.open()` - Opens translation panel
-- `window.close()` - Closes popup after action
+- `chrome.runtime.openOptionsPage()` - 打开词汇管理
+- `chrome.tabs.query()` - 获取活动标签页
+- `chrome.sidePanel.open()` - 打开翻译面板
+- `window.close()` - 操作后关闭弹窗
 
-## Future Enhancements
+## 未来改进
 
-- Export statistics to CSV/PDF
-- More detailed domain-wise breakdowns
-- Reading streak tracking
-- Daily/weekly goals and achievements
-- Comparison with previous periods
+- 导出统计到 CSV/PDF
+- 更详细的按域名分类
+- 阅读连续追踪
+- 每日/每周目标和成就
+- 与以前时期的比较

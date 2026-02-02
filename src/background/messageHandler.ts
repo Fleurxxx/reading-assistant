@@ -3,36 +3,36 @@ import { db, getTodayDateString } from "../storage/db";
 import { MessageType } from "../utils/messaging";
 
 /**
- * Message handler for background service worker
- * Processes all incoming messages from content scripts and other parts of the extension
+ * 后台服务工作线程的消息处理器
+ * 处理来自内容脚本和扩展其他部分的所有传入消息
  */
 export class MessageHandler {
   /**
-   * Handle translation request
+   * 处理翻译请求
    */
   async handleTranslation(
     data: { text: string; context?: string },
     _sender: chrome.runtime.MessageSender
   ): Promise<any> {
     try {
-      console.log("[MessageHandler] Translation request:", data.text);
+      console.log("[消息处理器] 翻译请求:", data.text);
 
-      // Validate input
+      // 验证输入
       if (!data.text || data.text.length === 0) {
-        throw new Error("Empty text provided");
+        throw new Error("提供的文本为空");
       }
 
       if (data.text.length > 5000) {
-        throw new Error("Text too long (max 5000 characters)");
+        throw new Error("文本过长（最多 5000 字符）");
       }
 
-      // Translate text
+      // 翻译文本
       const result = await translateText(data.text);
 
-      // Update translation count in daily stats
+      // 更新每日统计中的翻译次数
       await this.incrementTranslationCount();
 
-      // Send result to side panel
+      // 将结果发送到侧边栏
       await this.sendToSidePanel({
         type: MessageType.TRANSLATION_RESULT,
         data: {
@@ -44,14 +44,14 @@ export class MessageHandler {
 
       return { success: true, result };
     } catch (error: any) {
-      console.error("[MessageHandler] Translation error:", error);
+      console.error("[消息处理器] 翻译错误:", error);
 
-      // Send error to side panel
+      // 将错误发送到侧边栏
       await this.sendToSidePanel({
         type: MessageType.TRANSLATION_ERROR,
         data: {
           text: data.text,
-          error: error.message || "Translation failed",
+          error: error.message || "翻译失败",
         },
       });
 
@@ -60,7 +60,7 @@ export class MessageHandler {
   }
 
   /**
-   * Handle text extraction notification from content script
+   * 处理来自内容脚本的文本提取通知
    */
   async handleTextExtraction(data: {
     totalWords: number;
@@ -69,14 +69,14 @@ export class MessageHandler {
     url: string;
   }): Promise<any> {
     try {
-      console.log("[MessageHandler] Text extraction:", data);
+      console.log("[消息处理器] 文本提取:", data);
 
-      // Update reading stats
+      // 更新阅读统计
       const today = getTodayDateString();
       const existing = await db.readingStats.get(today);
 
       if (existing) {
-        // Update existing stats
+        // 更新现有统计
         const domainsSet = new Set(existing.domainsVisited);
         domainsSet.add(data.domain);
 
@@ -86,7 +86,7 @@ export class MessageHandler {
           domainsVisited: Array.from(domainsSet),
         });
       } else {
-        // Create new stats entry
+        // 创建新的统计条目
         await db.readingStats.add({
           date: today,
           wordsCount: data.totalWords,
@@ -99,13 +99,13 @@ export class MessageHandler {
 
       return { success: true };
     } catch (error: any) {
-      console.error("[MessageHandler] Text extraction error:", error);
+      console.error("[消息处理器] 文本提取错误:", error);
       return { success: false, error: error.message };
     }
   }
 
   /**
-   * Handle save vocabulary request
+   * 处理保存词汇请求
    */
   async handleSaveVocabulary(data: {
     word: string;
@@ -114,27 +114,27 @@ export class MessageHandler {
     pronunciation?: string;
   }): Promise<any> {
     try {
-      console.log("[MessageHandler] Save vocabulary:", data.word);
+      console.log("[消息处理器] 保存词汇:", data.word);
 
-      // Validate input
+      // 验证输入
       if (!data.word || !data.translation) {
-        throw new Error("Word and translation are required");
+        throw new Error("单词和翻译是必需的");
       }
 
       const normalizedWord = data.word.toLowerCase().trim();
 
-      // Check if word already exists
+      // 检查单词是否已存在
       const existing = await db.vocabulary.where("word").equals(normalizedWord).first();
 
       if (existing) {
         return {
           success: false,
-          error: "Word already in vocabulary",
+          error: "单词已在词汇表中",
           duplicate: true,
         };
       }
 
-      // Add to vocabulary
+      // 添加到词汇表
       const id = await db.vocabulary.add({
         word: normalizedWord,
         translation: data.translation,
@@ -147,13 +147,13 @@ export class MessageHandler {
 
       return { success: true, id };
     } catch (error: any) {
-      console.error("[MessageHandler] Save vocabulary error:", error);
+      console.error("[消息处理器] 保存词汇错误:", error);
       return { success: false, error: error.message };
     }
   }
 
   /**
-   * Handle get settings request
+   * 处理获取设置请求
    */
   async handleGetSettings(): Promise<any> {
     try {
@@ -165,19 +165,19 @@ export class MessageHandler {
         credentials: result.era_api_credentials,
       };
     } catch (error: any) {
-      console.error("[MessageHandler] Get settings error:", error);
+      console.error("[消息处理器] 获取设置错误:", error);
       return { success: false, error: error.message };
     }
   }
 
   /**
-   * Handle update settings request
+   * 处理更新设置请求
    */
   async handleUpdateSettings(settings: any): Promise<any> {
     try {
       await chrome.storage.local.set({ era_settings: settings });
 
-      // Broadcast settings update to all tabs
+      // 向所有标签页广播设置更新
       const tabs = await chrome.tabs.query({});
       for (const tab of tabs) {
         if (tab.id) {
@@ -187,20 +187,20 @@ export class MessageHandler {
               data: settings,
             });
           } catch (_error) {
-            // Tab may not have content script injected
+            // 标签页可能没有注入内容脚本
           }
         }
       }
 
       return { success: true };
     } catch (error: any) {
-      console.error("[MessageHandler] Update settings error:", error);
+      console.error("[消息处理器] 更新设置错误:", error);
       return { success: false, error: error.message };
     }
   }
 
   /**
-   * Handle open side panel request
+   * 处理打开侧边栏请求
    */
   async handleOpenSidePanel(sender: chrome.runtime.MessageSender): Promise<any> {
     try {
@@ -209,7 +209,7 @@ export class MessageHandler {
       } else if (sender.tab?.windowId) {
         await chrome.sidePanel.open({ windowId: sender.tab.windowId });
       } else {
-        // Fallback: open in current window
+        // 后备：在当前窗口打开
         const [currentTab] = await chrome.tabs.query({
           active: true,
           currentWindow: true,
@@ -220,50 +220,50 @@ export class MessageHandler {
       }
       return { success: true };
     } catch (error: any) {
-      console.error("[MessageHandler] Open side panel error:", error);
+      console.error("[消息处理器] 打开侧边栏错误:", error);
       return { success: false, error: error.message };
     }
   }
 
   /**
-   * Handle get selection request (from keyboard shortcut)
+   * 处理获取选择请求（来自键盘快捷键）
    */
   async handleGetSelection(sender: chrome.runtime.MessageSender): Promise<any> {
     try {
       if (!sender.tab?.id) {
-        return { success: false, error: "No active tab" };
+        return { success: false, error: "没有活动标签页" };
       }
 
-      // Send message to content script to get current selection
+      // 向内容脚本发送消息以获取当前选择
       const response = await chrome.tabs.sendMessage(sender.tab.id, {
         type: "GET_SELECTION",
       });
 
       if (response?.text) {
-        // Process the selection as a translation request
+        // 将选择作为翻译请求处理
         return await this.handleTranslation(
           { text: response.text, context: response.context },
           sender
         );
       }
 
-      return { success: false, error: "No text selected" };
+      return { success: false, error: "未选择文本" };
     } catch (error: any) {
-      console.error("[MessageHandler] Get selection error:", error);
+      console.error("[消息处理器] 获取选择错误:", error);
       return { success: false, error: error.message };
     }
   }
 
   /**
-   * Handle batch word updates
+   * 处理批量单词更新
    */
   async handleBatchWordUpdate(
     words: Array<{ word: string; count: number; domain: string }>
   ): Promise<any> {
     try {
-      console.log("[MessageHandler] Batch word update:", words.length, "words");
+      console.log("[消息处理器] 批量单词更新:", words.length, "个单词");
 
-      // Process words in batches to avoid blocking
+      // 批量处理单词以避免阻塞
       const batchSize = 50;
       let processed = 0;
 
@@ -275,7 +275,7 @@ export class MessageHandler {
             const existing = await db.words.get(word);
 
             if (existing) {
-              // Update existing word
+              // 更新现有单词
               const domainsSet = new Set(existing.domains);
               domainsSet.add(domain);
 
@@ -285,13 +285,13 @@ export class MessageHandler {
                 domains: Array.from(domainsSet),
               });
             } else {
-              // Add new word
+              // 添加新单词
               await db.words.add({
                 word,
                 count,
                 lastSeen: new Date(),
                 domains: [domain],
-                lemma: word, // Will be updated by lemmatizer later if needed
+                lemma: word, // 如果需要，稍后由词形还原器更新
               });
             }
           })
@@ -302,25 +302,25 @@ export class MessageHandler {
 
       return { success: true, processed };
     } catch (error: any) {
-      console.error("[MessageHandler] Batch word update error:", error);
+      console.error("[消息处理器] 批量单词更新错误:", error);
       return { success: false, error: error.message };
     }
   }
 
   /**
-   * Send message to side panel
+   * 向侧边栏发送消息
    */
   private async sendToSidePanel(message: any): Promise<void> {
     try {
       await chrome.runtime.sendMessage(message);
     } catch (error) {
-      // Side panel might not be open, that's okay
-      console.debug("[MessageHandler] Side panel not available:", error);
+      // 侧边栏可能未打开，这没关系
+      console.debug("[消息处理器] 侧边栏不可用:", error);
     }
   }
 
   /**
-   * Increment translation count in daily stats
+   * 增加每日统计中的翻译次数
    */
   private async incrementTranslationCount(): Promise<void> {
     try {
@@ -342,10 +342,10 @@ export class MessageHandler {
         });
       }
     } catch (error) {
-      console.error("[MessageHandler] Error incrementing translation count:", error);
+      console.error("[消息处理器] 增加翻译次数错误:", error);
     }
   }
 }
 
-// Export singleton instance
+// 导出单例实例
 export const messageHandler = new MessageHandler();
