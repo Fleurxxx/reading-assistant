@@ -1,484 +1,484 @@
-# Vocabulary Management Testing Guide
+# 词汇管理测试指南
 
-## Quick Start
+## 快速开始
 
-To test the vocabulary management features:
+测试词汇管理功能：
 
-1. **Build the extension**:
+1. **构建扩展：**
    ```bash
    npm run build
    ```
 
-2. **Load in Chrome**:
-   - Open `chrome://extensions/`
-   - Enable "Developer mode"
-   - Click "Load unpacked"
-   - Select the `dist` folder
+2. **在 Chrome 中加载：**
+   - 打开 `chrome://extensions/`
+   - 启用「开发者模式」
+   - 点击「加载已解压的扩展程序」
+   - 选择 `dist` 文件夹
 
-3. **Open the side panel**:
-   - Click the extension icon
-   - Or right-click and select "Open side panel"
+3. **打开侧边栏：**
+   - 点击扩展图标
+   - 或右键选择「Open side panel」
 
-## Feature Testing Checklist
+## 功能测试清单
 
-### 1. Adding Vocabulary (Translation Tab)
+### 1. 添加词汇（Translation 标签）
 
-**Steps:**
-1. Navigate to any English webpage
-2. Select a word or phrase
-3. The side panel should open to the Translation tab
-4. View the translation
-5. Click "Add to Vocabulary" button
+**步骤：**
+1. 访问任意英文网页
+2. 选中一个单词或短语
+3. 侧边栏应自动打开到 Translation 标签
+4. 查看翻译
+5. 点击「Add to Vocabulary」按钮
 
-**Expected Results:**
-- ✅ Button shows "Added to Vocabulary" with checkmark icon
-- ✅ Button changes to green background
-- ✅ Word is saved to database
-- ✅ Can now find word in Vocabulary tab
+**期望结果：**
+- ✅ 按钮显示 “Added to Vocabulary” 且有对勾图标
+- ✅ 按钮背景变为绿色
+- ✅ 单词已写入数据库
+- ✅ 在 Vocabulary 标签可找到该单词
 
-**Test Cases:**
-- Try adding same word twice (should show already saved)
-- Try adding word with special characters
-- Try adding multi-word phrase
-- Try adding word without examples
-
----
-
-### 2. Viewing Vocabulary (Vocabulary Tab)
-
-**Steps:**
-1. Click the "Vocabulary" tab
-2. View the vocabulary list
-
-**Expected Results:**
-- ✅ Statistics show correct counts (Total, Mastered, Learning)
-- ✅ All saved words are displayed
-- ✅ Cards show word, translation, and date added
-- ✅ Smooth scrolling with custom scrollbar
-- ✅ Empty state shows when no vocabulary
-
-**Test Cases:**
-- View with 0 words (empty state)
-- View with 1-5 words
-- View with 20+ words (test scrolling)
-- View with mastered and learning words
+**测试用例：**
+- 同一单词添加两次（应提示已保存）
+- 含特殊字符的单词
+- 多词短语
+- 无例句的单词
 
 ---
 
-### 3. Search Functionality
+### 2. 查看词汇（Vocabulary 标签）
 
-**Steps:**
-1. Add several words to vocabulary
-2. Go to Vocabulary tab
-3. Type in the search box
+**步骤：**
+1. 点击「Vocabulary」标签
+2. 查看词汇列表
 
-**Expected Results:**
-- ✅ Results filter in real-time
-- ✅ Matches words (case-insensitive)
-- ✅ Matches translations
-- ✅ Shows "No matches found" when appropriate
-- ✅ Clear search resets results
+**期望结果：**
+- ✅ 统计显示正确（总数、已掌握、学习中）
+- ✅ 所有已保存单词显示
+- ✅ 卡片展示单词、翻译与添加日期
+- ✅ 滚动顺滑，使用自定义滚动条
+- ✅ 无词汇时显示空状态
 
-**Test Cases:**
-- Search for partial word (e.g., "hel" finds "hello")
-- Search for translation text
-- Search for non-existent word
-- Search with special characters
-- Clear search (delete text)
+**测试用例：**
+- 0 个单词（空状态）
+- 1-5 个单词
+- 20+ 个单词（测试滚动）
+- 混合已掌握与学习中
 
 ---
 
-### 4. Filter by Mastery Status
+### 3. 搜索功能
 
-**Steps:**
-1. Have some mastered and some learning words
-2. Click "Filters" button
-3. Select different mastery filters
+**步骤：**
+1. 添加若干单词
+2. 打开 Vocabulary 标签
+3. 在搜索框输入
 
-**Expected Results:**
-- ✅ "All" shows all words
-- ✅ "Learning" shows only non-mastered words
-- ✅ "Mastered" shows only mastered words
-- ✅ Statistics update correctly
-- ✅ Active filter shows badge count
+**期望结果：**
+- ✅ 结果实时过滤
+- ✅ 匹配单词（不区分大小写）
+- ✅ 匹配翻译
+- ✅ 无结果时显示 “No matches found”
+- ✅ 清空搜索后恢复
 
-**Test Cases:**
-- Filter when all words are learning
-- Filter when all words are mastered
-- Filter when mixed
-- Combine with search
-
----
-
-### 5. Tag Management
-
-**Steps:**
-1. Click edit icon on a word card
-2. Type a tag name and press Enter or click +
-3. Add multiple tags
-4. Click X to remove a tag
-5. Click "Filters" and select tags to filter
-
-**Expected Results:**
-- ✅ Tag is added immediately
-- ✅ Tag appears as colored badge
-- ✅ Tags are saved to database
-- ✅ Can remove tags
-- ✅ Cannot add duplicate tags
-- ✅ Can filter by multiple tags
-- ✅ Tag filter shows all unique tags
-
-**Test Cases:**
-- Add single tag
-- Add multiple tags to one word
-- Remove tag from word
-- Try adding same tag twice (should prevent)
-- Add tags with spaces (should work)
-- Filter by one tag
-- Filter by multiple tags
-- Combine tag filter with mastery filter
+**测试用例：**
+- 模糊搜索（如 “hel” 匹配 “hello”）
+- 搜索翻译文本
+- 搜索不存在的单词
+- 含特殊字符搜索
+- 清空搜索
 
 ---
 
-### 6. Mastery Toggle
+### 4. 按掌握状态筛选
 
-**Steps:**
-1. Find a learning word (no checkmark)
-2. Click the circle icon
-3. Find a mastered word (has checkmark)
-4. Click the checkmark icon
+**步骤：**
+1. 准备部分已掌握、部分学习中
+2. 点击「Filters」
+3. 选择不同掌握筛选
 
-**Expected Results:**
-- ✅ Learning → Mastered: Circle → Checkmark, border turns green
-- ✅ Mastered → Learning: Checkmark → Circle, border turns gray
-- ✅ Statistics update immediately
-- ✅ Status persists after refresh
-- ✅ Mastery filter works with new status
+**期望结果：**
+- ✅ 「All」显示全部
+- ✅ 「Learning」仅显示未掌握
+- ✅ 「Mastered」仅显示已掌握
+- ✅ 统计实时更新
+- ✅ 激活的筛选有徽章计数
 
-**Test Cases:**
-- Toggle from learning to mastered
-- Toggle from mastered to learning
-- Toggle multiple words
-- Verify persistence (reload extension)
-- Check statistics accuracy
+**测试用例：**
+- 全部为学习中
+- 全部为已掌握
+- 混合场景
+- 与搜索组合
 
 ---
 
-### 7. Audio Pronunciation
+### 5. 标签管理
 
-**Steps:**
-1. Click the speaker icon on a word card
-2. Listen to pronunciation
+**步骤：**
+1. 点击词卡的编辑图标
+2. 输入标签名并回车或点击 +
+3. 添加多个标签
+4. 点击 X 删除标签
+5. 点击「Filters」选择标签过滤
 
-**Expected Results:**
-- ✅ Word is pronounced using Web Speech API
-- ✅ Icon shows pulse animation during playback
-- ✅ English (US) accent
-- ✅ Moderate speed (0.8x)
-- ✅ Works for single words and phrases
+**期望结果：**
+- ✅ 标签即时添加
+- ✅ 标签以彩色徽章显示
+- ✅ 标签写入数据库
+- ✅ 可删除标签
+- ✅ 不允许重复标签
+- ✅ 支持多标签过滤
+- ✅ 标签筛选列出所有唯一标签
 
-**Test Cases:**
-- Play pronunciation of single word
-- Play pronunciation of phrase
-- Try multiple words in succession
-- Verify animation during playback
-- Test in different browsers (if applicable)
-
----
-
-### 8. Delete Functionality
-
-**Steps:**
-1. Click the trash icon on a word card
-2. Confirm deletion in dialog
-
-**Expected Results:**
-- ✅ Confirmation dialog appears
-- ✅ Word is removed from list
-- ✅ Word is deleted from database
-- ✅ Statistics update
-- ✅ Cannot undo deletion
-
-**Test Cases:**
-- Delete word and confirm
-- Delete word and cancel
-- Delete last word (should show empty state)
-- Verify persistence (word stays deleted after refresh)
+**测试用例：**
+- 添加单个标签
+- 同一单词添加多个标签
+- 删除标签
+- 尝试重复添加（应阻止）
+- 含空格的标签（应可用）
+- 单标签过滤
+- 多标签过滤
+- 与掌握筛选组合
 
 ---
 
-### 9. Example Sentences
+### 6. 掌握度切换
 
-**Steps:**
-1. Find word with examples
-2. Click "Show Examples (N)"
-3. Click "Hide Examples (N)"
+**步骤：**
+1. 找到学习中单词（无对勾）
+2. 点击圆形图标
+3. 找到已掌握单词（有对勾）
+4. 点击对勾图标
 
-**Expected Results:**
-- ✅ Examples expand smoothly
-- ✅ Examples are styled with left border
-- ✅ Examples hide smoothly
-- ✅ Button text toggles
-- ✅ Chevron icon rotates
+**期望结果：**
+- ✅ 学习中 → 已掌握：圆 → 对勾，边框变绿
+- ✅ 已掌握 → 学习中：对勾 → 圆，边框变灰
+- ✅ 统计即时更新
+- ✅ 状态刷新后仍然存在
+- ✅ 掌握筛选与新状态一致
 
-**Test Cases:**
-- Expand examples
-- Collapse examples
-- Word with 1 example
-- Word with multiple examples
-- Word with no examples (button not shown)
-
----
-
-### 10. Export to CSV
-
-**Steps:**
-1. Add several words with various data (tags, examples, etc.)
-2. Click "Export" button in header
-
-**Expected Results:**
-- ✅ CSV file downloads
-- ✅ Filename: `vocabulary_YYYY-MM-DD.csv`
-- ✅ File opens in Excel/Google Sheets
-- ✅ All fields present: Word, Translation, Mastered, Tags, Added Date, Examples
-- ✅ Special characters handled correctly
-- ✅ Button disabled when no vocabulary
-
-**Test Cases:**
-- Export with 1 word
-- Export with 20+ words
-- Export with special characters
-- Export with multiple tags
-- Export with long examples
-- Verify CSV format in text editor
-- Open in Excel
-- Open in Google Sheets
+**测试用例：**
+- 学习中切到已掌握
+- 已掌握切回学习中
+- 多个单词连续切换
+- 验证持久化（重载扩展）
+- 校验统计正确性
 
 ---
 
-### 11. Sort Functionality
+### 7. 发音播放
 
-**Steps:**
-1. Have multiple words added at different times
-2. Select "Newest First" in sort dropdown
-3. Select "A-Z" in sort dropdown
+**步骤：**
+1. 点击词卡上的喇叭图标
+2. 收听发音
 
-**Expected Results:**
-- ✅ Newest First: Most recent at top
-- ✅ A-Z: Alphabetical order
-- ✅ Sort persists during search/filter
-- ✅ Smooth reordering
+**期望结果：**
+- ✅ 使用 Web Speech API 播放
+- ✅ 播放时图标出现脉冲动画
+- ✅ 英语（美式）口音
+- ✅ 适中速度（0.8x）
+- ✅ 单词与短语均可
 
-**Test Cases:**
-- Sort by date
-- Sort alphabetically
-- Sort with filters active
-- Sort with search active
-
----
-
-### 12. Tab Navigation
-
-**Steps:**
-1. Switch between Translation and Vocabulary tabs
-2. Select text while on Vocabulary tab
-3. Click a word in Vocabulary tab
-
-**Expected Results:**
-- ✅ Tabs switch smoothly
-- ✅ State preserved in each tab
-- ✅ New translation auto-switches to Translation tab
-- ✅ Clicking word in Vocabulary switches to Translation tab and shows details
-- ✅ Tab indicators (icons and colors) work correctly
-
-**Test Cases:**
-- Manual tab switching
-- Auto-switch on translation
-- Click word to view in translation tab
-- Verify state preservation (filters stay active when switching back)
+**测试用例：**
+- 播放单个单词
+- 播放短语
+- 连续播放多个单词
+- 验证播放时动画
+- 不同浏览器测试（如适用）
 
 ---
 
-### 13. Dark Mode
+### 8. 删除功能
 
-**Steps:**
-1. Enable dark mode in system settings
-2. Verify extension follows system preference
-3. Test all features in dark mode
+**步骤：**
+1. 点击词卡的垃圾桶图标
+2. 在对话框确认删除
 
-**Expected Results:**
-- ✅ Background colors invert appropriately
-- ✅ Text remains readable
-- ✅ Icons adjust colors
-- ✅ Borders and accents visible
-- ✅ Hover states work
-- ✅ Scrollbar styled for dark mode
-- ✅ All components support dark mode
+**期望结果：**
+- ✅ 弹出确认对话框
+- ✅ 单词从列表移除
+- ✅ 单词从数据库删除
+- ✅ 统计更新
+- ✅ 删除不可撤销
 
-**Test Cases:**
-- View in light mode
-- View in dark mode
-- Toggle between modes
-- Check all cards and buttons
-- Verify animations in dark mode
+**测试用例：**
+- 删除并确认
+- 删除但取消
+- 删除最后一个单词（应显示空状态）
+- 验证持久性（刷新后仍删除）
 
 ---
 
-### 14. Cross-Tab Word Selection
+### 9. 例句
 
-**Steps:**
-1. Add several words to vocabulary
-2. Go to Vocabulary tab
-3. Click on a word card
+**步骤：**
+1. 找到带例句的单词
+2. 点击「Show Examples (N)」
+3. 点击「Hide Examples (N)」
 
-**Expected Results:**
-- ✅ Switches to Translation tab
-- ✅ Shows word details
-- ✅ Translation displayed
-- ✅ Examples shown (if available)
-- ✅ Can play pronunciation
+**期望结果：**
+- ✅ 例句平滑展开
+- ✅ 例句带左侧强调条样式
+- ✅ 例句平滑收起
+- ✅ 按钮文字切换
+- ✅ 下拉箭头旋转
 
-**Test Cases:**
-- Click word with examples
-- Click word without examples
-- Click word with pronunciation
-- Verify all data displays correctly
-
----
-
-### 15. Responsive Layout
-
-**Steps:**
-1. Adjust side panel width (if possible)
-2. Scroll through long lists
-3. Test on different screen sizes
-
-**Expected Results:**
-- ✅ Layout adapts to width
-- ✅ No horizontal scrolling
-- ✅ Text wraps appropriately
-- ✅ Buttons remain accessible
-- ✅ Cards don't break layout
-
-**Test Cases:**
-- Minimum width
-- Maximum width
-- Normal width (~400px)
-- Very long words
-- Very long translations
+**测试用例：**
+- 展开例句
+- 收起例句
+- 只有 1 条例句
+- 多条例句
+- 无例句（不应显示按钮）
 
 ---
 
-## Performance Testing
+### 10. 导出 CSV
 
-### Expected Performance:
-- ✅ List renders in <100ms for 100 words
-- ✅ Search filters in real-time (<50ms)
-- ✅ Smooth scrolling (60fps)
-- ✅ No lag when toggling mastery
-- ✅ Quick database operations (<100ms)
+**步骤：**
+1. 添加包含标签、例句等多种数据的单词
+2. 点击头部的「Export」按钮
 
-### Load Testing:
-1. Add 50+ words
-2. Test search responsiveness
-3. Test filter combinations
-4. Test scrolling performance
-5. Test export with large dataset
+**期望结果：**
+- ✅ 下载 CSV 文件
+- ✅ 文件名：`vocabulary_YYYY-MM-DD.csv`
+- ✅ Excel / Google Sheets 可正常打开
+- ✅ 字段齐全：Word、Translation、Mastered、Tags、Added Date、Examples
+- ✅ 特殊字符处理正确
+- ✅ 无词汇时按钮禁用
+
+**测试用例：**
+- 1 个单词导出
+- 20+ 单词导出
+- 含特殊字符导出
+- 多标签导出
+- 长例句导出
+- 用文本编辑器检查 CSV 格式
+- 用 Excel 打开
+- 用 Google Sheets 打开
 
 ---
 
-## Browser Compatibility
+### 11. 排序功能
 
-Test in:
-- ✅ Chrome/Chromium
+**步骤：**
+1. 准备不同时间添加的多条单词
+2. 在排序下拉选择「Newest First」
+3. 再选择「A-Z」
+
+**期望结果：**
+- ✅ Newest First：最新记录在顶部
+- ✅ A-Z：按字母顺序
+- ✅ 搜索/筛选时排序保持
+- ✅ 重排流畅
+
+**测试用例：**
+- 按日期排序
+- 按字母排序
+- 筛选时排序
+- 搜索时排序
+
+---
+
+### 12. 标签导航
+
+**步骤：**
+1. 在 Translation 与 Vocabulary 标签间切换
+2. 在 Vocabulary 标签下选中文本
+3. 在 Vocabulary 标签点击单词
+
+**期望结果：**
+- ✅ 标签切换流畅
+- ✅ 各标签状态保持
+- ✅ 新翻译自动切到 Translation
+- ✅ 在 Vocabulary 点击单词会切到 Translation 并展示详情
+- ✅ 标签指示（图标与颜色）正常
+
+**测试用例：**
+- 手动切换标签
+- 翻译触发自动切换
+- 点击单词查看翻译
+- 验证状态保留（返回后筛选仍在）
+
+---
+
+### 13. 深色模式
+
+**步骤：**
+1. 在系统设置启用深色模式
+2. 确认扩展跟随系统
+3. 在深色模式测试全部功能
+
+**期望结果：**
+- ✅ 背景色正确反转
+- ✅ 文本可读
+- ✅ 图标颜色自适应
+- ✅ 边框和强调色可见
+- ✅ 悬停态正常
+- ✅ 滚动条有深色样式
+- ✅ 所有组件支持深色模式
+
+**测试用例：**
+- 亮色模式查看
+- 深色模式查看
+- 两种模式切换
+- 检查所有卡片和按钮
+- 验证深色模式下动画
+
+---
+
+### 14. 跨标签单词查看
+
+**步骤：**
+1. 添加若干单词
+2. 打开 Vocabulary 标签
+3. 点击任一词卡
+
+**期望结果：**
+- ✅ 跳转到 Translation 标签
+- ✅ 展示单词详情
+- ✅ 显示翻译
+- ✅ 有例句时展示
+- ✅ 可播放发音
+
+**测试用例：**
+- 点击有例句的单词
+- 点击无例句的单词
+- 点击有发音的单词
+- 核对数据完整显示
+
+---
+
+### 15. 响应式布局
+
+**步骤：**
+1. 调整侧边栏宽度（如可）
+2. 滚动长列表
+3. 在不同屏幕尺寸下测试
+
+**期望结果：**
+- ✅ 布局随宽度自适应
+- ✅ 无水平滚动
+- ✅ 文本正确换行
+- ✅ 按钮始终可点击
+- ✅ 卡片不会破版
+
+**测试用例：**
+- 最小宽度
+- 最大宽度
+- 常规宽度（约 400px）
+- 超长单词
+- 超长翻译
+
+---
+
+## 性能测试
+
+### 期望性能：
+- ✅ 100 个单词列表渲染 <100ms
+- ✅ 搜索实时过滤（<50ms）
+- ✅ 滚动流畅（60fps）
+- ✅ 切换掌握度无卡顿
+- ✅ 数据库操作快速（<100ms）
+
+### 压力测试：
+1. 添加 50+ 单词
+2. 测试搜索响应
+3. 组合多种筛选
+4. 测试滚动性能
+5. 测试大数据集导出
+
+---
+
+## 浏览器兼容性
+
+测试于：
+- ✅ Chrome / Chromium
 - ✅ Edge
 - ✅ Brave
-- ✅ Opera (Chromium-based)
+- ✅ Opera（Chromium 内核）
 
 ---
 
-## Edge Cases
+## 边界场景
 
-### 1. Empty States
-- No vocabulary saved
-- Search with no results
-- Filter with no matches
-- All words mastered
-- All words learning
+### 1. 空状态
+- 未保存任何词汇
+- 搜索无结果
+- 筛选无匹配
+- 全部为已掌握
+- 全部为学习中
 
-### 2. Data Limits
-- Very long word (100+ chars)
-- Very long translation (1000+ chars)
-- Many examples (10+)
-- Many tags (20+)
-- Large vocabulary (1000+ words)
+### 2. 数据上限
+- 超长单词（100+ 字符）
+- 超长翻译（1000+ 字符）
+- 大量例句（10+）
+- 大量标签（20+）
+- 大规模词汇表（1000+）
 
-### 3. Special Characters
-- Words with apostrophes (it's, won't)
-- Words with hyphens (well-being)
-- Non-English characters (café)
-- Numbers (COVID-19)
-- Punctuation in tags
+### 3. 特殊字符
+- 含撇号的词（it's, won't）
+- 含连字符的词（well-being）
+- 非英文字符（café）
+- 数字（COVID-19）
+- 标签中含标点
 
-### 4. Concurrent Operations
-- Add word while filtering
-- Delete word while searching
-- Toggle mastery during filter
-- Edit tags while viewing
+### 4. 并发操作
+- 筛选时添加单词
+- 搜索时删除单词
+- 筛选中切换掌握度
+- 查看时编辑标签
 
-### 5. Error Scenarios
-- Database connection error
-- Export failure
-- Audio playback unavailable
-- Duplicate word handling
-
----
-
-## Success Criteria
-
-The vocabulary management system passes testing if:
-
-- ✅ All 15 core features work as expected
-- ✅ No console errors during normal use
-- ✅ Data persists across sessions
-- ✅ UI is responsive and smooth
-- ✅ Dark mode fully functional
-- ✅ Export produces valid CSV
-- ✅ No data loss on operations
-- ✅ Performance meets targets
-- ✅ Edge cases handled gracefully
-- ✅ Accessibility requirements met
+### 5. 异常场景
+- 数据库连接错误
+- 导出失败
+- 音频不可用
+- 处理重复单词
 
 ---
 
-## Bug Reporting Template
+## 通过标准
 
-If you find a bug, report it with:
+词汇管理系统通过测试需满足：
+
+- ✅ 15 个核心功能均按预期工作
+- ✅ 正常使用无控制台错误
+- ✅ 数据可跨会话持久化
+- ✅ 界面响应流畅
+- ✅ 深色模式完整可用
+- ✅ 导出生成的 CSV 有效
+- ✅ 各操作无数据丢失
+- ✅ 性能达标
+- ✅ 边界场景处理得当
+- ✅ 满足无障碍要求
+
+---
+
+## 缺陷报告模板
+
+发现缺陷时，请按以下格式：
 
 ```
-**Bug**: [Brief description]
+**Bug**: [简要描述]
 **Steps to Reproduce**:
-1. [Step 1]
-2. [Step 2]
-3. [Step 3]
+1. [步骤 1]
+2. [步骤 2]
+3. [步骤 3]
 
-**Expected**: [What should happen]
-**Actual**: [What actually happens]
-**Browser**: [Chrome version]
-**Console Errors**: [Any errors]
-**Screenshots**: [If applicable]
+**Expected**: [期望行为]
+**Actual**: [实际行为]
+**Browser**: [Chrome 版本]
+**Console Errors**: [错误日志]
+**Screenshots**: [如有]
 ```
 
 ---
 
-## Automated Testing (Future)
+## 自动化测试（未来计划）
 
-Consider adding:
-- Unit tests for VocabularyRepository
-- Integration tests for components
-- E2E tests with Playwright
-- Performance benchmarks
-- Visual regression tests
+可考虑添加：
+- VocabularyRepository 单元测试
+- 组件集成测试
+- Playwright 端到端测试
+- 性能基准
+- 视觉回归测试
 
 ---
 

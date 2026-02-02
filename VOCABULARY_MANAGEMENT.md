@@ -1,25 +1,25 @@
-# Vocabulary Management Implementation
+# 词汇管理实现
 
-## Overview
+## 概述
 
-The vocabulary management feature allows users to save, organize, and review words they encounter while reading. This document describes the complete implementation.
+词汇管理功能让用户在阅读时保存、整理并复习遇到的单词。本文档描述完整的实现细节。
 
-## Features Implemented
+## 已实现的功能
 
-### 1. Vocabulary Collection
+### 1. 词汇收集
 
-#### Add to Vocabulary (TranslationView.tsx)
-- **Location**: Translation side panel
-- **Functionality**: 
-  - "Add to Vocabulary" button in translation view
-  - Automatically checks if word already exists
-  - Shows "Added to Vocabulary" confirmation when saved
-  - Persists pronunciation, translation, and example sentences
-  - Sends message to background for statistics tracking
+#### 添加到词汇表（TranslationView.tsx）
+- **位置**：翻译侧边栏
+- **功能**：
+  - 翻译视图中的「Add to Vocabulary」按钮
+  - 自动检测单词是否已存在
+  - 保存成功后显示 “Added to Vocabulary” 确认提示
+  - 持久化发音、翻译和例句
+  - 发送消息到后台用于统计
 
-#### Storage (vocabularyRepository.ts)
-- **Database**: IndexedDB via Dexie.js
-- **Schema**: 
+#### 存储（vocabularyRepository.ts）
+- **数据库**：Dexie.js 封装的 IndexedDB
+- **Schema**：
   ```typescript
   {
     id?: number;
@@ -32,331 +32,331 @@ The vocabulary management feature allows users to save, organize, and review wor
     pronunciation?: string;
   }
   ```
-- **Operations**: Full CRUD support (Create, Read, Update, Delete)
+- **操作**：完整的增删改查（Create / Read / Update / Delete）
 
-### 2. Vocabulary List View (VocabularyList.tsx)
+### 2. 词汇列表视图（VocabularyList.tsx）
 
-#### Display Features
-- **Statistics Dashboard**: 
-  - Total words count
-  - Mastered words count
-  - Learning words count
-- **List View**: Scrollable list of vocabulary cards
-- **Empty States**: Helpful messages when no vocabulary or no search results
+#### 展示特性
+- **统计面板**：
+  - 单词总数
+  - 已掌握数量
+  - 学习中数量
+- **列表视图**：可滚动的词汇卡列表
+- **空状态**：在没有数据或无搜索结果时提供提示信息
 
-#### Search Functionality
-- Full-text search across word and translation fields
-- Real-time filtering as user types
-- Search icon indicator
-- Clear visual feedback
+#### 搜索功能
+- 对单词与翻译字段进行全文搜索
+- 用户输入时实时过滤
+- 搜索图标提示
+- 清晰的视觉反馈
 
-#### Filter Options
-- **Mastery Status Filter**:
-  - All words
-  - Learning only
-  - Mastered only
-- **Tag Filter**:
-  - Multi-select tag filtering
-  - Shows all available tags
-  - Visual indicator for selected tags
-- **Sort Options**:
-  - Newest first (by date added)
-  - Alphabetical (A-Z)
+#### 筛选选项
+- **掌握状态筛选**：
+  - 全部
+  - 仅学习中
+  - 仅已掌握
+- **标签筛选**：
+  - 多选标签过滤
+  - 展示全部可用标签
+  - 已选标签有明显视觉标识
+- **排序**：
+  - 按添加日期最新优先
+  - 按字母顺序（A-Z）
 
-#### Export Functionality
-- **CSV Export**: 
-  - One-click export to CSV file
-  - Filename format: `vocabulary_YYYY-MM-DD.csv`
-  - Includes all fields: word, translation, mastered status, tags, date, examples
-  - Properly formatted with quotes for special characters
-  - Compatible with Excel, Google Sheets, etc.
+#### 导出功能
+- **CSV 导出**：
+  - 一键导出为 CSV 文件
+  - 文件名格式：`vocabulary_YYYY-MM-DD.csv`
+  - 包含所有字段：单词、翻译、掌握状态、标签、日期、例句
+  - 对特殊字符使用引号，保证格式正确
+  - 兼容 Excel、Google Sheets 等
 
-### 3. Word Card Component (WordCard.tsx)
+### 3. 单词卡组件（WordCard.tsx）
 
-#### Display Elements
-- **Word**: Large, prominent display
-- **Translation**: Chinese translation
-- **Pronunciation**: Phonetic notation (if available)
-- **Mastery Badge**: Green checkmark for mastered words
-- **Tags**: Colored tag badges
-- **Date Added**: Footer with calendar icon
-- **Examples**: Expandable section for example sentences
+#### 显示元素
+- **单词**：大字号突出显示
+- **翻译**：中文释义
+- **发音**：如有则显示音标
+- **掌握徽章**：已掌握显示绿色勾选
+- **标签**：彩色标签徽章
+- **添加日期**：带日历图标的页脚
+- **例句**：可折叠的例句区域
 
-#### Interactive Features
+#### 交互特性
 
-##### Audio Pronunciation
-- **Icon**: Speaker button
-- **Functionality**: Uses Web Speech API
-- **Settings**: English (US), 0.8 speed
-- **Visual Feedback**: Pulse animation during playback
+##### 发音播放
+- **图标**：喇叭按钮
+- **功能**：使用 Web Speech API
+- **设置**：English (US)，速度 0.8
+- **视觉反馈**：播放时的脉冲动画
 
-##### Mastery Toggle
-- **States**: 
-  - Learning (empty circle icon)
-  - Mastered (filled checkmark icon)
-- **Action**: Single click to toggle
-- **Persistence**: Immediately saved to database
-- **Visual**: Color-coded borders (green for mastered)
+##### 掌握度切换
+- **状态**：
+  - 学习中（空心圆图标）
+  - 已掌握（实心对勾图标）
+- **操作**：单击即可切换
+- **持久化**：立即保存到数据库
+- **视觉**：边框颜色区分（绿色代表已掌握）
 
-##### Tag Management
-- **View Mode**: Display all tags with badge UI
-- **Edit Mode**: 
-  - Click edit icon to enter edit mode
-  - Add new tags with input field
-  - Press Enter or click + button to add
-  - Click X on tags to remove
-  - Auto-lowercase for consistency
-- **Validation**: Prevents duplicate tags
-- **Storage**: Immediately persisted to database
+##### 标签管理
+- **查看模式**：展示所有标签徽章
+- **编辑模式**：
+  - 点击编辑图标进入编辑状态
+  - 输入框添加新标签
+  - 回车或点击 + 按钮提交
+  - 点击标签上的 X 删除
+  - 自动转为小写保持一致
+- **校验**：防止重复标签
+- **存储**：变更即时写入数据库
 
-##### Delete Functionality
-- **Icon**: Trash can button (red hover state)
-- **Safety**: Confirmation dialog before deletion
-- **Action**: Permanently removes from database
-- **Feedback**: Card disappears from list
+##### 删除功能
+- **图标**：垃圾桶按钮（悬停为红色）
+- **安全**：删除前弹出确认
+- **操作**：从数据库永久移除
+- **反馈**：卡片从列表消失
 
-##### Example Sentences
-- **Toggle**: "Show/Hide Examples (N)" button
-- **Display**: Expandable section with styled cards
-- **Format**: Italicized text with left border accent
-- **Count**: Shows number of examples available
+##### 例句展示
+- **切换**：使用 “Show/Hide Examples (N)” 按钮
+- **显示**：可展开的样式化卡片区域
+- **格式**：斜体文字并带左侧强调条
+- **计数**：显示可用例句数量
 
-### 4. Tab Navigation (App.tsx)
+### 4. 标签导航（App.tsx）
 
-#### Two-Tab Interface
-- **Translation Tab**: 
-  - Shows translation results
-  - Active when receiving new translations
-  - Icon: Languages
-- **Vocabulary Tab**: 
-  - Shows saved vocabulary list
-  - Persists filter/search state
-  - Icon: BookMarked
+#### 双标签界面
+- **Translation 标签**：
+  - 展示翻译结果
+  - 接收到新翻译时自动激活
+  - 图标：Languages
+- **Vocabulary 标签**：
+  - 展示已保存的词汇列表
+  - 保留筛选/搜索状态
+  - 图标：BookMarked
 
-#### Smart Switching
-- Auto-switches to Translation tab when:
-  - User selects text to translate
-  - Translation result arrives
-  - Translation error occurs
-- Manual switching:
-  - Click tab headers
-  - Smooth transitions
-  - Maintains state in each tab
+#### 智能切换
+- 自动切换到 Translation 标签的情况：
+  - 用户选中文本进行翻译
+  - 翻译结果返回
+  - 翻译出错
+- 手动切换：
+  - 点击标签页头
+  - 平滑过渡
+  - 各标签保持各自状态
 
-#### Cross-Tab Integration
-- Click a word in Vocabulary tab:
-  - Switches to Translation tab
-  - Shows word details
-  - Enables pronunciation playback
-  - Displays saved examples
+#### 跨标签联动
+- 在 Vocabulary 标签点击单词：
+  - 切换到 Translation 标签
+  - 展示该单词详情
+  - 可播放发音
+  - 显示已保存的例句
 
-### 5. Visual Design
+### 5. 视觉设计
 
-#### Color Scheme
-- **Primary**: Sky blue (#0ea5e9) for actions and highlights
-- **Success**: Green (#22c55e) for mastered items
-- **Danger**: Red (#ef4444) for delete actions
-- **Neutral**: Slate gray for text and backgrounds
+#### 配色
+- **主色**：天蓝色（#0ea5e9），用于操作与高亮
+- **成功**：绿色（#22c55e），用于已掌握状态
+- **危险**：红色（#ef4444），用于删除操作
+- **中性**：板岩灰，用于文本与背景
 
-#### Dark Mode Support
-- All components fully support dark mode
-- Automatic color adjustments
-- Consistent contrast ratios
-- Smooth transitions between modes
+#### 深色模式
+- 全部组件完整支持深色模式
+- 颜色自动调整
+- 保持对比度一致
+- 模式切换平滑
 
-#### Animations
-- **Slide In**: Entry animation for cards (300ms)
-- **Audio Pulse**: Speaker icon animation during playback (600ms)
-- **Hover Effects**: Subtle scaling and color changes
-- **Transitions**: Smooth color and transform transitions (150-300ms)
+#### 动画
+- **Slide In**：卡片入场动画（300ms）
+- **Audio Pulse**：播放时喇叭图标动画（600ms）
+- **Hover Effects**：轻微缩放与颜色变化
+- **Transitions**：颜色与变换的平滑过渡（150-300ms）
 
-#### Responsive Design
-- Optimized for side panel width (typically 400-600px)
-- Flexible layouts adapt to height changes
-- Scrollable content areas with custom scrollbars
-- Touch-friendly button sizes
+#### 响应式
+- 针对侧边栏宽度优化（通常 400-600px）
+- 布局随高度变化灵活调整
+- 内容区域可滚动并带自定义滚动条
+- 按钮尺寸对触控友好
 
-### 6. Data Flow
+### 6. 数据流
 
-#### Adding a Word
+#### 添加单词
 ```
-User selects text → Translation loads → User clicks "Add to Vocabulary"
-  → Check if exists → Save to IndexedDB → Update UI → Send stats message
-```
-
-#### Filtering Vocabulary
-```
-User changes filter/search → Compute filtered list (useMemo)
-  → Re-render cards → Maintain scroll position
+用户选择文本 → 翻译加载 → 点击 "Add to Vocabulary"
+  → 检查是否存在 → 保存到 IndexedDB → 更新 UI → 发送统计消息
 ```
 
-#### Updating Mastery
+#### 筛选词汇
 ```
-User clicks mastery toggle → Update database → Reload list
-  → Update statistics → Refresh UI
-```
-
-#### Exporting CSV
-```
-User clicks Export → Fetch all vocabulary → Format as CSV
-  → Create Blob → Trigger download → Clean up resources
+用户修改筛选/搜索 → 计算筛选结果（useMemo）
+  → 重新渲染卡片 → 保持滚动位置
 ```
 
-## Technical Implementation
+#### 更新掌握度
+```
+用户点击掌握度切换 → 更新数据库 → 重新加载列表
+  → 更新统计 → 刷新 UI
+```
 
-### Dependencies
-- **React 18**: UI framework
-- **Dexie.js**: IndexedDB wrapper
-- **Lucide React**: Icon library
-- **Tailwind CSS**: Styling framework
+#### 导出 CSV
+```
+用户点击导出 → 获取全部词汇 → 格式化为 CSV
+  → 创建 Blob → 触发下载 → 清理资源
+```
 
-### State Management
-- **Local State**: React useState for UI state
-- **Memoization**: useMemo for expensive computations (filtering)
-- **Effects**: useEffect for data loading and listeners
-- **Callbacks**: Proper dependency arrays to prevent unnecessary re-renders
+## 技术实现
 
-### Performance Optimizations
-- **Memoized Filtering**: Prevents recalculation on every render
-- **Lazy Loading**: Only loads visible vocabulary items
-- **Debounced Search**: (Can be added) Reduce search operations
-- **Efficient Updates**: Targeted database operations
-- **Minimal Re-renders**: Proper React optimization patterns
+### 依赖
+- **React 18**：UI 框架
+- **Dexie.js**：IndexedDB 封装
+- **Lucide React**：图标库
+- **Tailwind CSS**：样式框架
 
-### Error Handling
-- Try-catch blocks on all async operations
-- Console logging for debugging
-- User-friendly error messages
-- Graceful degradation when features unavailable
+### 状态管理
+- **本地状态**：使用 React useState 管理 UI 状态
+- **记忆化**：useMemo 处理耗时运算（筛选）
+- **副作用**：useEffect 用于数据加载与监听
+- **回调**：合理的依赖数组，避免不必要重渲染
 
-### Accessibility
-- Semantic HTML elements
-- Title attributes on interactive elements
-- Keyboard navigation support
-- Focus indicators
-- Color contrast compliance
+### 性能优化
+- **记忆化筛选**：避免每次渲染都重新计算
+- **惰性加载**：仅加载可见词汇项
+- **搜索防抖**：（可选）减少搜索次数
+- **高效更新**：针对性数据库操作
+- **最少重渲染**：遵循 React 优化模式
 
-## Testing Checklist
+### 错误处理
+- 所有异步操作均使用 try-catch
+- 控制台日志便于调试
+- 对用户友好的错误提示
+- 功能不可用时优雅降级
 
-### Basic Operations
-- [ ] Add word to vocabulary from translation view
-- [ ] View all vocabulary words
-- [ ] Search for specific words
-- [ ] Filter by mastery status
-- [ ] Filter by tags
-- [ ] Sort by date and alphabetically
+### 无障碍
+- 语义化 HTML 元素
+- 交互元素添加 title 提示
+- 支持键盘导航
+- 聚焦态可见
+- 确保颜色对比度
 
-### Word Management
-- [ ] Toggle mastery status
-- [ ] Play pronunciation audio
-- [ ] Add tags to word
-- [ ] Remove tags from word
-- [ ] Delete word with confirmation
-- [ ] Expand/collapse examples
+## 测试清单
 
-### Export
-- [ ] Export empty vocabulary (disabled)
-- [ ] Export vocabulary with data
-- [ ] Verify CSV format
-- [ ] Check special characters handling
+### 基本操作
+- [ ] 在翻译视图中添加单词到词汇表
+- [ ] 查看全部词汇
+- [ ] 搜索特定单词
+- [ ] 按掌握状态筛选
+- [ ] 按标签筛选
+- [ ] 按日期和字母排序
+
+### 单词管理
+- [ ] 切换掌握状态
+- [ ] 播放发音
+- [ ] 给单词添加标签
+- [ ] 从单词移除标签
+- [ ] 确认后删除单词
+- [ ] 展开/折叠例句
+
+### 导出
+- [ ] 导出为空时按钮禁用
+- [ ] 导出含数据的词汇表
+- [ ] 验证 CSV 格式
+- [ ] 检查特殊字符处理
 
 ### UI/UX
-- [ ] Tab switching works smoothly
-- [ ] Auto-switch to translation on new selection
-- [ ] Click word in vocabulary shows in translation view
-- [ ] Dark mode toggle works correctly
-- [ ] Animations are smooth
-- [ ] Empty states display correctly
+- [ ] 标签页切换流畅
+- [ ] 新选中文本后自动切到翻译标签
+- [ ] 在词汇表点击单词后翻译视图展示
+- [ ] 深色模式切换正常
+- [ ] 动画流畅
+- [ ] 空状态展示正确
 
-### Edge Cases
-- [ ] Handle duplicate word additions
-- [ ] Handle very long words/translations
-- [ ] Handle special characters in tags
-- [ ] Handle network errors gracefully
-- [ ] Handle database errors
+### 边界情况
+- [ ] 处理重复添加单词
+- [ ] 处理超长单词/翻译
+- [ ] 处理标签中的特殊字符
+- [ ] 网络错误处理得当
+- [ ] 数据库错误处理得当
 
-## Future Enhancements
+## 未来增强
 
-### Planned Features
-1. **Bulk Operations**: 
-   - Select multiple words
-   - Bulk delete
-   - Bulk tag assignment
-   - Bulk export
+### 计划特性
+1. **批量操作**：
+   - 选择多个单词
+   - 批量删除
+   - 批量分配标签
+   - 批量导出
 
-2. **Advanced Search**:
-   - Search within examples
-   - Regular expression support
-   - Fuzzy matching
+2. **高级搜索**：
+   - 在例句中搜索
+   - 正则表达式支持
+   - 模糊匹配
 
-3. **Tag Management**:
-   - Rename tags globally
-   - Merge tags
-   - Tag color customization
-   - Tag hierarchy/nesting
+3. **标签管理**：
+   - 全局重命名标签
+   - 合并标签
+   - 标签颜色自定义
+   - 标签层级/嵌套
 
-4. **Statistics & Analytics**:
-   - Learning progress charts
-   - Review frequency tracking
-   - Retention rate metrics
-   - Word difficulty analysis
+4. **统计与分析**：
+   - 学习进度图表
+   - 复习频次跟踪
+   - 保留率指标
+   - 单词难度分析
 
-5. **Study Features**:
-   - Flashcard mode
-   - Spaced repetition
-   - Quiz/test mode
-   - Review reminders
+5. **学习功能**：
+   - 闪卡模式
+   - 间隔重复
+   - 测验/考试模式
+   - 复习提醒
 
-6. **Import/Export**:
-   - Import from Anki
-   - Import from CSV
-   - Export to Anki format
-   - Cloud backup/sync
+6. **导入/导出**：
+   - 从 Anki 导入
+   - 从 CSV 导入
+   - 导出为 Anki 格式
+   - 云端备份/同步
 
-7. **Customization**:
-   - Custom fields
-   - Card layout options
-   - Font size adjustment
-   - Compact/expanded view toggle
+7. **个性化**：
+   - 自定义字段
+   - 卡片布局选项
+   - 字号调节
+   - 紧凑/展开视图切换
 
-## File Structure
+## 文件结构
 
 ```
 src/
 ├── components/
-│   ├── VocabularyList.tsx    # Main vocabulary management UI
-│   ├── WordCard.tsx           # Individual word card component
-│   └── README.md              # Component documentation
+│   ├── VocabularyList.tsx     # 词汇管理主界面
+│   ├── WordCard.tsx           # 单个单词卡片组件
+│   └── README.md              # 组件文档
 ├── sidepanel/
-│   ├── App.tsx                # Tab navigation & routing
-│   ├── TranslationView.tsx    # Translation view with "Add" button
-│   └── sidepanel.css          # Custom animations & styles
+│   ├── App.tsx                # 标签导航与路由
+│   ├── TranslationView.tsx    # 带“添加”按钮的翻译视图
+│   └── sidepanel.css          # 自定义动画与样式
 ├── storage/
-│   ├── db.ts                  # Database schema
-│   └── vocabularyRepository.ts # CRUD operations
+│   ├── db.ts                  # 数据库 Schema
+│   └── vocabularyRepository.ts # CRUD 操作
 └── utils/
-    └── messaging.ts           # Chrome extension messaging
+    └── messaging.ts           # Chrome 扩展消息封装
 ```
 
-## Integration Points
+## 集成点
 
 ### Content Script
-- Text selection detection
-- Send translation requests
-- Trigger side panel
+- 检测文本选择
+- 发送翻译请求
+- 触发侧边栏
 
 ### Background Service Worker
-- Handle translation API calls
-- Cache results
-- Update statistics
-- Manage side panel state
+- 处理翻译 API 调用
+- 缓存结果
+- 更新统计
+- 管理侧边栏状态
 
-### Side Panel
-- Display translations
-- Show vocabulary list
-- Handle user interactions
-- Persist user preferences
+### 侧边栏
+- 显示翻译结果
+- 展示词汇列表
+- 处理用户交互
+- 持久化用户偏好
 
-## Conclusion
+## 结论
 
-The vocabulary management system is fully implemented with a comprehensive feature set including search, filtering, tagging, mastery tracking, and CSV export. The UI is polished with animations, dark mode support, and responsive design. The architecture is modular, maintainable, and ready for future enhancements.
+词汇管理系统已完整实现，涵盖搜索、筛选、标签、掌握度跟踪和 CSV 导出等功能。界面具备动画、深色模式与响应式设计，架构模块化且可维护，并为未来扩展做好准备。
