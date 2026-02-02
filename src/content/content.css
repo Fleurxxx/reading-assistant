@@ -1,0 +1,163 @@
+/**
+ * Content script styles
+ * Minimal styles to avoid conflicts with page styles
+ */
+
+/* Selection highlight (optional - can be enabled via settings) */
+.era-selection-highlight {
+  background-color: rgba(255, 235, 59, 0.3);
+  transition: background-color 0.2s ease;
+}
+
+/* Loading indicator for translation */
+.era-loading-indicator {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: era-fade-in 0.2s ease;
+}
+
+@keyframes era-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.era-loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: era-spin 0.8s linear infinite;
+}
+
+@keyframes era-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Toast notification */
+.era-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: white;
+  color: #333;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  z-index: 999999;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: era-slide-in 0.3s ease;
+  max-width: 300px;
+}
+
+@keyframes era-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.era-toast.era-success {
+  background: #4caf50;
+  color: white;
+}
+
+.era-toast.era-error {
+  background: #f44336;
+  color: white;
+}
+
+.era-toast.era-info {
+  background: #2196f3;
+  color: white;
+}
+
+/* Context menu highlight */
+.era-context-highlight {
+  background-color: rgba(33, 150, 243, 0.2);
+  border-radius: 2px;
+  transition: background-color 0.2s ease;
+}
+
+/* Prevent text selection conflicts */
+.era-no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .era-toast {
+    background: #333;
+    color: white;
+  }
+}
+
+/* Accessibility */
+.era-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .era-selection-highlight {
+    background-color: rgba(255, 235, 59, 0.5);
+    outline: 2px solid #000;
+  }
+  
+  .era-loading-indicator,
+  .era-toast {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .era-loading-indicator,
+  .era-toast,
+  .era-selection-highlight,
+  .era-context-highlight {
+    animation: none;
+    transition: none;
+  }
+  
+  .era-loading-spinner {
+    animation: none;
+    border-top-color: transparent;
+  }
+}

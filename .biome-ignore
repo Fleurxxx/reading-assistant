@@ -1,0 +1,18 @@
+# Biome ignore file
+# Add files or directories to ignore during linting and formatting
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Generated files
+*.min.js
+*.bundle.js
+
+# Legacy config files that may have different formatting
+vite.config.ts
+postcss.config.js
+tailwind.config.js

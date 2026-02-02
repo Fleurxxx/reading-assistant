@@ -1,0 +1,6 @@
+{
+  "*.{js,jsx,ts,tsx,json}": [
+    "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
+  ],
+  "*.{css,scss}": ["biome format --write --no-errors-on-unmatched"]
+}
