@@ -1,14 +1,14 @@
-// App constants
+// 应用常量
 export const APP_NAME = "English Reading Assistant";
 export const APP_VERSION = "1.0.0";
 
-// Storage keys
+// 存储键
 export const STORAGE_KEYS = {
   SETTINGS: "era_settings",
   API_CREDENTIALS: "era_api_credentials",
 } as const;
 
-// Default settings
+// 默认设置
 export interface AppSettings {
   autoAnalysis: boolean;
   blacklistDomains: string[];
@@ -29,12 +29,12 @@ export const DEFAULT_SETTINGS: AppSettings = {
   enableShortcuts: true,
 };
 
-// API Configuration
+// API 配置
 export const YOUDAO_API_URL = "https://openapi.youdao.com/api";
 export const TRANSLATION_CACHE_EXPIRY_DAYS = 30;
 export const MAX_TRANSLATION_LENGTH = 5000;
 
-// Text processing
+// 文本处理
 export const MIN_WORD_LENGTH = 2;
 export const MAX_WORD_LENGTH = 45;
 export const TEXT_EXTRACTION_DEBOUNCE_MS = 200;
@@ -43,6 +43,6 @@ export const TEXT_EXTRACTION_DEBOUNCE_MS = 200;
 export const SIDE_PANEL_WIDTH = 400;
 export const ANIMATION_DURATION_MS = 300;
 
-// Statistics
+// 统计
 export const TOP_WORDS_LIMIT = 10;
 export const STATS_RETENTION_DAYS = 90;

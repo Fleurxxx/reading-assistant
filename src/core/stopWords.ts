@@ -1,11 +1,11 @@
-// Common English stop words to filter out
+// 要过滤掉的常见英语停用词
 export const STOP_WORDS = new Set([
-  // Articles
+  // 冠词
   "a",
   "an",
   "the",
 
-  // Pronouns
+  // 代词
   "i",
   "you",
   "he",

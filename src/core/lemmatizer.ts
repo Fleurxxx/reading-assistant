@@ -1,8 +1,8 @@
 import nlp from "compromise";
 
 /**
- * Lemmatizes a word to its base form using compromise.js
- * Examples: running -> run, cats -> cat, better -> good
+ * 使用 compromise.js 将单词还原为其基本形式
+ * 示例: running -> run, cats -> cat, better -> good
  */
 export function lemmatize(word: string): string {
   if (!word || word.length === 0) {
@@ -12,34 +12,34 @@ export function lemmatize(word: string): string {
   try {
     const doc = nlp(word);
 
-    // Get the root form of verbs
+    // 获取动词的原形
     if (doc.verbs().length > 0) {
       const infinitive = doc.verbs().toInfinitive().text();
       if (infinitive) return infinitive.toLowerCase();
     }
 
-    // Get singular form of nouns
+    // 获取名词的单数形式
     if (doc.nouns().length > 0) {
       const singular = doc.nouns().toSingular().text();
       if (singular) return singular.toLowerCase();
     }
 
-    // Get base form of adjectives
+    // 获取形容词的基本形式
     if (doc.adjectives().length > 0) {
       const base = doc.adjectives().json()[0];
       if (base?.normal) return base.normal.toLowerCase();
     }
 
-    // Return original word if no transformation found
+    // 如果没有找到转换，返回原始单词
     return word.toLowerCase();
   } catch (error) {
-    console.error("Lemmatization error:", error);
+    console.error("词形还原错误:", error);
     return word.toLowerCase();
   }
 }
 
 /**
- * Batch lemmatize multiple words for efficiency
+ * 批量还原多个单词以提高效率
  */
 export function lemmatizeBatch(words: string[]): Map<string, string> {
   const result = new Map<string, string>();

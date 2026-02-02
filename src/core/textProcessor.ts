@@ -3,17 +3,17 @@ import { isProperNoun, lemmatize } from "./lemmatizer";
 import { isStopWord } from "./stopWords";
 
 /**
- * Word frequency data structure
+ * 单词频率数据结构
  */
 export interface WordFrequency {
   word: string;
   lemma: string;
   count: number;
-  positions: number[]; // Character positions in text
+  positions: number[]; // 文本中的字符位置
 }
 
 /**
- * Result of text processing
+ * 文本处理结果
  */
 export interface TextAnalysisResult {
   totalWords: number;
@@ -24,10 +24,10 @@ export interface TextAnalysisResult {
 }
 
 /**
- * Clean and preprocess text
- * - Remove extra whitespace
- * - Normalize punctuation
- * - Keep sentence structure for context
+ * 清理和预处理文本
+ * - 删除多余的空白
+ * - 规范化标点符号
+ * - 保留句子结构以保持上下文
  */
 export function cleanText(text: string): string {
   return (

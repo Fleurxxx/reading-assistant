@@ -1,17 +1,17 @@
 import Dexie, { type Table } from "dexie";
 
-// Database interfaces
+// 数据库接口
 export interface Word {
-  word: string; // primary key
+  word: string; // 主键
   count: number;
   lastSeen: Date;
   domains: string[];
   lemma: string;
-  difficulty?: string; // A1-C2 CEFR level
+  difficulty?: string; // A1-C2 CEFR 级别
 }
 
 export interface Vocabulary {
-  id?: number; // auto-increment
+  id?: number; // 自动递增
   word: string;
   translation: string;
   examples: string[];
@@ -22,7 +22,7 @@ export interface Vocabulary {
 }
 
 export interface TranslationCache {
-  text: string; // primary key
+  text: string; // 主键
   result: TranslationResult;
   cachedAt: Date;
   expiresAt: Date;
@@ -37,15 +37,15 @@ export interface TranslationResult {
 }
 
 export interface ReadingStats {
-  date: string; // primary key (YYYY-MM-DD)
+  date: string; // 主键 (YYYY-MM-DD)
   wordsCount: number;
   domainsVisited: string[];
   translationCount: number;
-  readingTime: number; // in minutes
+  readingTime: number; // 分钟
   uniqueWords: number;
 }
 
-// Database class
+// 数据库类
 export class AppDatabase extends Dexie {
   words!: Table<Word, string>;
   vocabulary!: Table<Vocabulary, number>;
@@ -64,10 +64,10 @@ export class AppDatabase extends Dexie {
   }
 }
 
-// Singleton instance - safe for both content scripts and service workers
+// 单例实例 - 对内容脚本和服务工作线程都安全
 export const db = new AppDatabase();
 
-// Helper to clean expired cache entries
+// 清理过期缓存条目的辅助函数
 export async function cleanExpiredCache(): Promise<number> {
   const now = new Date();
   const expired = await db.translationCache.where("expiresAt").below(now).toArray();
