@@ -55,9 +55,15 @@ const SettingsForm: React.FC = () => {
   const saveSettings = async () => {
     setSaving(true);
     try {
+      const normalizedCredentials = {
+        appKey: credentials.appKey.trim(),
+        appSecret: credentials.appSecret.trim(),
+      };
+      setCredentials(normalizedCredentials);
+
       await chrome.storage.local.set({
         [STORAGE_KEYS.SETTINGS]: settings,
-        [STORAGE_KEYS.API_CREDENTIALS]: credentials,
+        [STORAGE_KEYS.API_CREDENTIALS]: normalizedCredentials,
       });
 
       showMessage("success", t.settings.saveSuccess);

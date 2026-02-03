@@ -85,7 +85,11 @@ export class YoudaoTranslator implements TranslationAdapter {
     try {
       const result = await chrome.storage.local.get(STORAGE_KEYS.API_CREDENTIALS);
       if (result[STORAGE_KEYS.API_CREDENTIALS]) {
-        this.credentials = result[STORAGE_KEYS.API_CREDENTIALS];
+        const { appKey = "", appSecret = "" } = result[STORAGE_KEYS.API_CREDENTIALS];
+        this.credentials = {
+          appKey: appKey.trim(),
+          appSecret: appSecret.trim(),
+        };
       }
     } catch (error) {
       console.error("Failed to load Youdao credentials:", error);
@@ -96,7 +100,7 @@ export class YoudaoTranslator implements TranslationAdapter {
    * Save API credentials to Chrome storage
    */
   async setCredentials(appKey: string, appSecret: string): Promise<void> {
-    this.credentials = { appKey, appSecret };
+    this.credentials = { appKey: appKey.trim(), appSecret: appSecret.trim() };
     await chrome.storage.local.set({
       [STORAGE_KEYS.API_CREDENTIALS]: this.credentials,
     });
