@@ -75,10 +75,15 @@ reading-assistant/
 
 ## 📚 开发文档
 
-- [代码规范](./CODE_STANDARDS.md) - 代码风格和提交规范
-- [实现状态](./IMPLEMENTATION_STATUS.md) - 功能实现进度
-- [词汇管理](./VOCABULARY_MANAGEMENT.md) - 词汇功能详细说明
-- [测试指南](./TESTING_AND_OPTIMIZATION_GUIDE.md) - 测试和优化指南
+所有详细文档已移至 [`docs/`](./docs/) 目录：
+
+- **[国际化指南](./docs/I18N_GUIDE.md)** - 多语言支持完整文档
+- **[快速上手 i18n](./docs/QUICK_START_I18N.md)** - 5分钟快速入门
+- **[词汇管理](./docs/VOCABULARY_MANAGEMENT.md)** - 词汇功能详细说明
+- **[代码规范](./docs/CODE_STANDARDS.md)** - 代码风格和提交规范
+- **[测试指南](./docs/QUICK_TEST.md)** - 功能测试指南
+
+📖 查看完整文档列表：[docs/README.md](./docs/README.md)
 
 ## 🔧 可用脚本
 

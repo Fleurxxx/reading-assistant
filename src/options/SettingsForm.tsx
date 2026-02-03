@@ -1,6 +1,7 @@
-import { Monitor, Moon, Plus, RotateCcw, Save, Settings, Sun } from "lucide-react";
+import { Globe, Monitor, Moon, Plus, RotateCcw, Save, Settings, Sun } from "lucide-react";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "../i18n";
 import { type AppSettings, DEFAULT_SETTINGS, STORAGE_KEYS } from "../utils/constants";
 
 interface APICredentials {
@@ -9,6 +10,7 @@ interface APICredentials {
 }
 
 const SettingsForm: React.FC = () => {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [credentials, setCredentials] = useState<APICredentials>({ appKey: "", appSecret: "" });
   const [loading, setLoading] = useState(true);
@@ -19,11 +21,12 @@ const SettingsForm: React.FC = () => {
   const [blacklistInput, setBlacklistInput] = useState("");
   const [whitelistInput, setWhitelistInput] = useState("");
 
-  useEffect(() => {
-    loadSettings();
-  }, [loadSettings]);
+  const showMessage = useCallback((type: "success" | "error", text: string) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage(null), 5000);
+  }, []);
 
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       const result = await chrome.storage.local.get([
         STORAGE_KEYS.SETTINGS,
@@ -39,11 +42,15 @@ const SettingsForm: React.FC = () => {
       }
     } catch (error) {
       console.error("Failed to load settings:", error);
-      showMessage("error", "Failed to load settings");
+      showMessage("error", t.settings.loadError);
     } finally {
       setLoading(false);
     }
-  };
+  }, [showMessage, t.settings.loadError]);
+
+  useEffect(() => {
+    loadSettings();
+  }, [loadSettings]);
 
   const saveSettings = async () => {
     setSaving(true);
@@ -53,29 +60,24 @@ const SettingsForm: React.FC = () => {
         [STORAGE_KEYS.API_CREDENTIALS]: credentials,
       });
 
-      showMessage("success", "Settings saved successfully!");
+      showMessage("success", t.settings.saveSuccess);
 
       // Apply theme immediately
       applyTheme(settings.theme);
     } catch (error) {
       console.error("Failed to save settings:", error);
-      showMessage("error", "Failed to save settings");
+      showMessage("error", t.settings.saveError);
     } finally {
       setSaving(false);
     }
   };
 
   const resetSettings = () => {
-    if (confirm("Are you sure you want to reset all settings to defaults?")) {
+    if (confirm(t.settings.resetConfirm)) {
       setSettings(DEFAULT_SETTINGS);
       setCredentials({ appKey: "", appSecret: "" });
-      showMessage("success", "Settings reset to defaults");
+      showMessage("success", t.settings.resetSuccess);
     }
-  };
-
-  const showMessage = (type: "success" | "error", text: string) => {
-    setMessage({ type, text });
-    setTimeout(() => setMessage(null), 5000);
   };
 
   const applyTheme = (theme: "light" | "dark" | "auto") => {
@@ -98,14 +100,14 @@ const SettingsForm: React.FC = () => {
     // Basic domain validation
     const domainPattern = /^([a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,}|\*)$/i;
     if (!domainPattern.test(input.trim())) {
-      showMessage("error", "Invalid domain format. Use domain.com or *.domain.com");
+      showMessage("error", t.domain.invalidFormat);
       return;
     }
 
     const domains = type === "blacklist" ? settings.blacklistDomains : settings.whitelistDomains;
 
     if (domains.includes(input.trim())) {
-      showMessage("error", "Domain already exists");
+      showMessage("error", t.domain.alreadyExists);
       return;
     }
 
@@ -139,7 +141,7 @@ const SettingsForm: React.FC = () => {
     a.click();
     URL.revokeObjectURL(url);
 
-    showMessage("success", "Settings exported successfully");
+    showMessage("success", t.settings.exportSuccess);
   };
 
   const importSettings = () => {
@@ -157,12 +159,12 @@ const SettingsForm: React.FC = () => {
           const data = JSON.parse(event.target?.result as string);
           if (data.settings) {
             setSettings({ ...DEFAULT_SETTINGS, ...data.settings });
-            showMessage("success", "Settings imported successfully");
+            showMessage("success", t.settings.importSuccess);
           } else {
-            showMessage("error", "Invalid settings file");
+            showMessage("error", t.settings.invalidFile);
           }
         } catch (_error) {
-          showMessage("error", "Failed to parse settings file");
+          showMessage("error", t.settings.parseError);
         }
       };
       reader.readAsText(file);
@@ -175,7 +177,7 @@ const SettingsForm: React.FC = () => {
     return (
       <div className="options-container">
         <div className="flex items-center justify-center h-screen">
-          <div className="text-lg">Loading settings...</div>
+          <div className="text-lg">{t.settings.loading}</div>
         </div>
       </div>
     );
@@ -187,10 +189,8 @@ const SettingsForm: React.FC = () => {
         <div className="flex items-center gap-3">
           <Settings className="w-8 h-8 text-sky-500" />
           <div>
-            <h1 className="text-3xl font-bold">English Reading Assistant</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Configure your reading enhancement preferences
-            </p>
+            <h1 className="text-3xl font-bold">{t.settings.title}</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">{t.settings.description}</p>
           </div>
         </div>
       </div>
@@ -203,18 +203,19 @@ const SettingsForm: React.FC = () => {
 
       {/* General Settings */}
       <div className="options-section">
-        <h2 className="section-title">General Settings</h2>
+        <h2 className="section-title">{t.general.title}</h2>
 
         <div className="form-group">
           <div className="toggle-container">
             <div>
-              <label className="form-label">Auto Analysis</label>
-              <span className="form-description">
-                Automatically analyze text on pages you visit
-              </span>
+              <label className="form-label" htmlFor="autoAnalysis-toggle">
+                {t.general.autoAnalysis.label}
+              </label>
+              <span className="form-description">{t.general.autoAnalysis.description}</span>
             </div>
             <label className="toggle-switch">
               <input
+                id="autoAnalysis-toggle"
                 type="checkbox"
                 className="toggle-input"
                 checked={settings.autoAnalysis}
@@ -228,15 +229,18 @@ const SettingsForm: React.FC = () => {
         <div className="form-group">
           <div className="toggle-container">
             <div>
-              <label className="form-label">Enable Keyboard Shortcuts</label>
+              <label className="form-label" htmlFor="shortcuts-toggle">
+                {t.general.shortcuts.label}
+              </label>
               <span className="form-description">
-                Use keyboard shortcuts for quick translation
+                {t.general.shortcuts.description}
                 <span className="shortcut-key">Ctrl+Shift+T</span> (Mac:{" "}
                 <span className="shortcut-key">Cmd+Shift+T</span>)
               </span>
             </div>
             <label className="toggle-switch">
               <input
+                id="shortcuts-toggle"
                 type="checkbox"
                 className="toggle-input"
                 checked={settings.enableShortcuts}
@@ -250,12 +254,13 @@ const SettingsForm: React.FC = () => {
 
       {/* Appearance */}
       <div className="options-section">
-        <h2 className="section-title">Appearance</h2>
+        <h2 className="section-title">{t.appearance.title}</h2>
 
         <div className="form-group">
-          <label className="form-label">Theme</label>
+          <p className="form-label">{t.appearance.theme.label}</p>
           <div className="flex gap-3 mt-2">
             <button
+              type="button"
               className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition ${
                 settings.theme === "light"
                   ? "border-sky-500 bg-sky-50 dark:bg-sky-900"
@@ -264,9 +269,10 @@ const SettingsForm: React.FC = () => {
               onClick={() => setSettings({ ...settings, theme: "light" })}
             >
               <Sun className="w-5 h-5" />
-              Light
+              {t.appearance.theme.light}
             </button>
             <button
+              type="button"
               className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition ${
                 settings.theme === "dark"
                   ? "border-sky-500 bg-sky-50 dark:bg-sky-900"
@@ -275,9 +281,10 @@ const SettingsForm: React.FC = () => {
               onClick={() => setSettings({ ...settings, theme: "dark" })}
             >
               <Moon className="w-5 h-5" />
-              Dark
+              {t.appearance.theme.dark}
             </button>
             <button
+              type="button"
               className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition ${
                 settings.theme === "auto"
                   ? "border-sky-500 bg-sky-50 dark:bg-sky-900"
@@ -286,17 +293,18 @@ const SettingsForm: React.FC = () => {
               onClick={() => setSettings({ ...settings, theme: "auto" })}
             >
               <Monitor className="w-5 h-5" />
-              Auto
+              {t.appearance.theme.auto}
             </button>
           </div>
         </div>
 
         <div className="form-group">
-          <label className="form-label">
-            Font Size
+          <label className="form-label" htmlFor="font-size-range">
+            {t.appearance.fontSize.label}
             <span className="range-value">{settings.fontSize}px</span>
           </label>
           <input
+            id="font-size-range"
             type="range"
             min="12"
             max="20"
@@ -307,39 +315,78 @@ const SettingsForm: React.FC = () => {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Side Panel Position</label>
+          <label className="form-label" htmlFor="sidepanel-position">
+            {t.appearance.sidePanelPosition.label}
+          </label>
           <select
+            id="sidepanel-position"
             className="form-select"
             value={settings.sidePanelPosition}
             onChange={(e) =>
               setSettings({ ...settings, sidePanelPosition: e.target.value as "left" | "right" })
             }
           >
-            <option value="left">Left</option>
-            <option value="right">Right</option>
+            <option value="left">{t.appearance.sidePanelPosition.left}</option>
+            <option value="right">{t.appearance.sidePanelPosition.right}</option>
           </select>
+        </div>
+
+        <div className="form-group">
+          <p className="form-label">{t.appearance.language.label}</p>
+          <span className="form-description">{t.appearance.language.description}</span>
+          <div className="flex gap-3 mt-2">
+            <button
+              type="button"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition ${
+                settings.language === "zh"
+                  ? "border-sky-500 bg-sky-50 dark:bg-sky-900"
+                  : "border-gray-300 dark:border-gray-600"
+              }`}
+              onClick={() => setSettings({ ...settings, language: "zh" })}
+            >
+              <Globe className="w-5 h-5" />
+              {t.appearance.language.zh}
+            </button>
+            <button
+              type="button"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition ${
+                settings.language === "en"
+                  ? "border-sky-500 bg-sky-50 dark:bg-sky-900"
+                  : "border-gray-300 dark:border-gray-600"
+              }`}
+              onClick={() => setSettings({ ...settings, language: "en" })}
+            >
+              <Globe className="w-5 h-5" />
+              {t.appearance.language.en}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Domain Management */}
       <div className="options-section">
-        <h2 className="section-title">Domain Management</h2>
+        <h2 className="section-title">{t.domain.title}</h2>
 
         <div className="form-group">
-          <label className="form-label">Blacklist Domains</label>
-          <span className="form-description">
-            Disable word analysis on these domains (e.g., github.com or *.google.com)
-          </span>
+          <label className="form-label" htmlFor="blacklist-input">
+            {t.domain.blacklist.label}
+          </label>
+          <span className="form-description">{t.domain.blacklist.description}</span>
           <div className="flex gap-2 mt-2">
             <input
+              id="blacklist-input"
               type="text"
               className="form-input"
-              placeholder="example.com or *.example.com"
+              placeholder={t.domain.blacklist.placeholder}
               value={blacklistInput}
               onChange={(e) => setBlacklistInput(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && addDomain("blacklist")}
             />
-            <button className="btn btn-primary" onClick={() => addDomain("blacklist")}>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={() => addDomain("blacklist")}
+            >
               <Plus className="w-4 h-4" />
             </button>
           </div>
@@ -349,9 +396,19 @@ const SettingsForm: React.FC = () => {
               {settings.blacklistDomains.map((domain) => (
                 <div key={domain} className="domain-item">
                   <span>{domain}</span>
-                  <span className="domain-remove" onClick={() => removeDomain("blacklist", domain)}>
-                    Remove
-                  </span>
+                  <button
+                    type="button"
+                    className="domain-remove"
+                    onClick={() => removeDomain("blacklist", domain)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        removeDomain("blacklist", domain);
+                      }
+                    }}
+                  >
+                    {t.domain.remove}
+                  </button>
                 </div>
               ))}
             </div>
@@ -359,20 +416,25 @@ const SettingsForm: React.FC = () => {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Whitelist Domains</label>
-          <span className="form-description">
-            Only analyze text on these domains (leave empty to analyze all)
-          </span>
+          <label className="form-label" htmlFor="whitelist-input">
+            {t.domain.whitelist.label}
+          </label>
+          <span className="form-description">{t.domain.whitelist.description}</span>
           <div className="flex gap-2 mt-2">
             <input
+              id="whitelist-input"
               type="text"
               className="form-input"
-              placeholder="example.com or *.example.com"
+              placeholder={t.domain.whitelist.placeholder}
               value={whitelistInput}
               onChange={(e) => setWhitelistInput(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && addDomain("whitelist")}
             />
-            <button className="btn btn-primary" onClick={() => addDomain("whitelist")}>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={() => addDomain("whitelist")}
+            >
               <Plus className="w-4 h-4" />
             </button>
           </div>
@@ -382,9 +444,19 @@ const SettingsForm: React.FC = () => {
               {settings.whitelistDomains.map((domain) => (
                 <div key={domain} className="domain-item">
                   <span>{domain}</span>
-                  <span className="domain-remove" onClick={() => removeDomain("whitelist", domain)}>
-                    Remove
-                  </span>
+                  <button
+                    type="button"
+                    className="domain-remove"
+                    onClick={() => removeDomain("whitelist", domain)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        removeDomain("whitelist", domain);
+                      }
+                    }}
+                  >
+                    {t.domain.remove}
+                  </button>
                 </div>
               ))}
             </div>
@@ -394,11 +466,10 @@ const SettingsForm: React.FC = () => {
 
       {/* API Configuration */}
       <div className="options-section">
-        <h2 className="section-title">Translation API</h2>
+        <h2 className="section-title">{t.api.title}</h2>
 
         <div className="credentials-warning">
-          <strong>Note:</strong> Youdao API credentials are required for translation features. Get
-          your API keys from{" "}
+          <strong>{t.api.note}</strong> {t.api.noteLink}{" "}
           <a
             href="https://ai.youdao.com/"
             target="_blank"
@@ -410,22 +481,28 @@ const SettingsForm: React.FC = () => {
         </div>
 
         <div className="form-group">
-          <label className="form-label">App Key</label>
+          <label className="form-label" htmlFor="appkey-input">
+            {t.api.appKey.label}
+          </label>
           <input
+            id="appkey-input"
             type="text"
             className="form-input"
-            placeholder="Enter your Youdao App Key"
+            placeholder={t.api.appKey.placeholder}
             value={credentials.appKey}
             onChange={(e) => setCredentials({ ...credentials, appKey: e.target.value })}
           />
         </div>
 
         <div className="form-group">
-          <label className="form-label">App Secret</label>
+          <label className="form-label" htmlFor="appsecret-input">
+            {t.api.appSecret.label}
+          </label>
           <input
+            id="appsecret-input"
             type="password"
             className="form-input"
-            placeholder="Enter your Youdao App Secret"
+            placeholder={t.api.appSecret.placeholder}
             value={credentials.appSecret}
             onChange={(e) => setCredentials({ ...credentials, appSecret: e.target.value })}
           />
@@ -434,21 +511,21 @@ const SettingsForm: React.FC = () => {
 
       {/* Advanced Settings */}
       <div className="options-section">
-        <h2 className="section-title">Advanced</h2>
+        <h2 className="section-title">{t.advanced.title}</h2>
 
         <div className="form-group">
-          <label className="form-label">Export Settings</label>
-          <span className="form-description">Export your settings to a JSON file for backup</span>
-          <button className="btn btn-secondary mt-2" onClick={exportSettings}>
-            Export Settings
+          <p className="form-label">{t.advanced.export.label}</p>
+          <span className="form-description">{t.advanced.export.description}</span>
+          <button className="btn btn-secondary mt-2" type="button" onClick={exportSettings}>
+            {t.advanced.export.button}
           </button>
         </div>
 
         <div className="form-group">
-          <label className="form-label">Import Settings</label>
-          <span className="form-description">Import settings from a previously exported file</span>
-          <button className="btn btn-secondary mt-2" onClick={importSettings}>
-            Import Settings
+          <p className="form-label">{t.advanced.import.label}</p>
+          <span className="form-description">{t.advanced.import.description}</span>
+          <button className="btn btn-secondary mt-2" type="button" onClick={importSettings}>
+            {t.advanced.import.button}
           </button>
         </div>
       </div>
@@ -456,21 +533,23 @@ const SettingsForm: React.FC = () => {
       {/* Action Buttons */}
       <div className="button-group">
         <button
+          type="button"
           className="btn btn-primary flex items-center gap-2"
           onClick={saveSettings}
           disabled={saving}
         >
           <Save className="w-4 h-4" />
-          {saving ? "Saving..." : "Save Settings"}
+          {saving ? t.settings.saving : t.actions.save}
         </button>
 
         <button
+          type="button"
           className="btn btn-secondary flex items-center gap-2"
           onClick={resetSettings}
           disabled={saving}
         >
           <RotateCcw className="w-4 h-4" />
-          Reset to Defaults
+          {t.actions.reset}
         </button>
       </div>
     </div>

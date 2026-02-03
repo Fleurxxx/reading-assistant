@@ -6,9 +6,11 @@ import { defineConfig } from "vite";
 import manifest from "./src/manifest.json";
 
 export default defineConfig({
+  // Chrome 扩展需要使用相对路径
+  base: "./",
   plugins: [
     react(),
-    crx({ manifest: manifest as any }),
+    crx({ manifest: manifest as chrome.runtime.ManifestV3 }),
     // Plugin to copy content.css after build
     {
       name: "copy-content-css",
@@ -34,6 +36,20 @@ export default defineConfig({
         sidepanel: "src/sidepanel/sidepanel.html",
         popup: "src/popup/popup.html",
         options: "src/options/options.html",
+      },
+      output: {
+        // 避免 chunk 文件名以下划线开头（Chrome 扩展不允许）
+        chunkFileNames: (chunkInfo) => {
+          const name = chunkInfo.name;
+          // 如果文件名以下划线开头，去掉下划线
+          const safeName = name.startsWith("_") ? name.slice(1) : name;
+          return `assets/${safeName}-[hash].js`;
+        },
+        assetFileNames: (assetInfo) => {
+          const name = assetInfo.name || "";
+          const safeName = name.startsWith("_") ? name.slice(1) : name;
+          return `assets/${safeName}-[hash].[ext]`;
+        },
       },
     },
   },

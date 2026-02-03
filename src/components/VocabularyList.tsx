@@ -1,5 +1,6 @@
 import { BookmarkCheck, FileDown, Filter, Loader2, Search, Tag } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "../i18n";
 import type { Vocabulary } from "../storage/db";
 import { vocabularyRepository } from "../storage/vocabularyRepository";
 import WordCard from "./WordCard";
@@ -9,6 +10,7 @@ interface VocabularyListProps {
 }
 
 function VocabularyList({ onWordSelect }: VocabularyListProps) {
+  const { t } = useTranslation();
   const [vocabulary, setVocabulary] = useState<Vocabulary[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -19,7 +21,7 @@ function VocabularyList({ onWordSelect }: VocabularyListProps) {
   const [allTags, setAllTags] = useState<string[]>([]);
 
   // Load vocabulary and tags
-  const loadVocabulary = async () => {
+  const loadVocabulary = useCallback(async () => {
     try {
       setLoading(true);
       const data = await vocabularyRepository.getAll();
@@ -32,7 +34,7 @@ function VocabularyList({ onWordSelect }: VocabularyListProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadVocabulary();
@@ -107,7 +109,7 @@ function VocabularyList({ onWordSelect }: VocabularyListProps) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-8">
         <Loader2 className="w-12 h-12 text-sky-500 animate-spin mb-4" />
-        <p className="text-sm text-slate-600 dark:text-slate-400">Loading vocabulary...</p>
+        <p className="text-sm text-slate-600 dark:text-slate-400">{t.settings.loading}</p>
       </div>
     );
   }
@@ -118,9 +120,10 @@ function VocabularyList({ onWordSelect }: VocabularyListProps) {
       <div className="flex-shrink-0 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
-            My Vocabulary
+            {t.vocabulary.title}
           </h1>
           <button
+            type="button"
             onClick={exportToCSV}
             disabled={vocabulary.length === 0}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/30 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -137,13 +140,17 @@ function VocabularyList({ onWordSelect }: VocabularyListProps) {
             <div className="text-xl font-bold text-slate-800 dark:text-slate-100">
               {stats.total}
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">Total</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">
+              {t.vocabulary.stats.total}
+            </div>
           </div>
           <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-2 text-center">
             <div className="text-xl font-bold text-green-700 dark:text-green-400">
               {stats.mastered}
             </div>
-            <div className="text-xs text-green-600 dark:text-green-500">Mastered</div>
+            <div className="text-xs text-green-600 dark:text-green-500">
+              {t.vocabulary.stats.mastered}
+            </div>
           </div>
           <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-2 text-center">
             <div className="text-xl font-bold text-amber-700 dark:text-amber-400">
@@ -161,7 +168,7 @@ function VocabularyList({ onWordSelect }: VocabularyListProps) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search vocabulary..."
+            placeholder={t.vocabulary.search}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 dark:focus:ring-sky-400"
@@ -171,6 +178,7 @@ function VocabularyList({ onWordSelect }: VocabularyListProps) {
         {/* Filter Controls */}
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
               showFilters || selectedTags.length > 0 || masteryFilter !== "all"
@@ -179,7 +187,7 @@ function VocabularyList({ onWordSelect }: VocabularyListProps) {
             }`}
           >
             <Filter className="w-3.5 h-3.5" />
-            Filters
+            {t.vocabulary.filter.all}
             {(selectedTags.length > 0 || masteryFilter !== "all") && (
               <span className="bg-sky-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">
                 {selectedTags.length + (masteryFilter !== "all" ? 1 : 0)}
@@ -193,8 +201,8 @@ function VocabularyList({ onWordSelect }: VocabularyListProps) {
             onChange={(e) => setSortBy(e.target.value as "date" | "word")}
             className="px-3 py-1.5 text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-sky-500"
           >
-            <option value="date">Newest First</option>
-            <option value="word">A-Z</option>
+            <option value="date">{t.vocabulary.sort.recent}</option>
+            <option value="word">{t.vocabulary.sort.alphabetical}</option>
           </select>
         </div>
 
@@ -203,12 +211,13 @@ function VocabularyList({ onWordSelect }: VocabularyListProps) {
           <div className="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-700">
             {/* Mastery Filter */}
             <div>
-              <label className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-2 block">
+              <p className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
                 Mastery Status
-              </label>
+              </p>
               <div className="flex gap-2">
                 {(["all", "learning", "mastered"] as const).map((filter) => (
                   <button
+                    type="button"
                     key={filter}
                     onClick={() => setMasteryFilter(filter)}
                     className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
@@ -226,12 +235,13 @@ function VocabularyList({ onWordSelect }: VocabularyListProps) {
             {/* Tags Filter */}
             {allTags.length > 0 && (
               <div>
-                <label className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-2 block">
+                <p className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-2">
                   Filter by Tags
-                </label>
+                </p>
                 <div className="flex flex-wrap gap-1.5">
                   {allTags.map((tag) => (
                     <button
+                      type="button"
                       key={tag}
                       onClick={() => toggleTag(tag)}
                       className={`flex items-center gap-1 px-2 py-1 text-xs rounded-md transition-colors ${
@@ -259,7 +269,7 @@ function VocabularyList({ onWordSelect }: VocabularyListProps) {
             <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
               {searchQuery || selectedTags.length > 0 || masteryFilter !== "all"
                 ? "No matches found"
-                : "No vocabulary yet"}
+                : t.vocabulary.empty}
             </h2>
             <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs">
               {searchQuery || selectedTags.length > 0 || masteryFilter !== "all"

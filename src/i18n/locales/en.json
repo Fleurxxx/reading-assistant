@@ -1,0 +1,202 @@
+{
+  "app": {
+    "name": "English Reading Assistant",
+    "description": "Configure your reading enhancement preferences"
+  },
+  "settings": {
+    "title": "English Reading Assistant",
+    "description": "Configure your reading enhancement preferences",
+    "loading": "Loading settings...",
+    "saving": "Saving...",
+    "saveSuccess": "Settings saved successfully!",
+    "saveError": "Failed to save settings",
+    "loadError": "Failed to load settings",
+    "resetConfirm": "Are you sure you want to reset all settings to defaults?",
+    "resetSuccess": "Settings reset to defaults",
+    "exportSuccess": "Settings exported successfully",
+    "importSuccess": "Settings imported successfully",
+    "importError": "Failed to import settings",
+    "invalidFile": "Invalid settings file",
+    "parseError": "Failed to parse settings file"
+  },
+  "general": {
+    "title": "General Settings",
+    "autoAnalysis": {
+      "label": "Auto Analysis",
+      "description": "Automatically analyze text on pages you visit"
+    },
+    "shortcuts": {
+      "label": "Enable Keyboard Shortcuts",
+      "description": "Use keyboard shortcuts for quick translation"
+    }
+  },
+  "appearance": {
+    "title": "Appearance",
+    "theme": {
+      "label": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "auto": "Auto"
+    },
+    "fontSize": {
+      "label": "Font Size"
+    },
+    "sidePanelPosition": {
+      "label": "Side Panel Position",
+      "left": "Left",
+      "right": "Right"
+    },
+    "language": {
+      "label": "Display Language",
+      "description": "Choose the interface language for the extension",
+      "zh": "简体中文",
+      "en": "English"
+    }
+  },
+  "domain": {
+    "title": "Domain Management",
+    "blacklist": {
+      "label": "Blacklist Domains",
+      "description": "Disable word analysis on these domains (e.g., github.com or *.google.com)",
+      "placeholder": "example.com or *.example.com"
+    },
+    "whitelist": {
+      "label": "Whitelist Domains",
+      "description": "Only analyze text on these domains (leave empty to analyze all)",
+      "placeholder": "example.com or *.example.com"
+    },
+    "add": "Add",
+    "remove": "Remove",
+    "invalidFormat": "Invalid domain format. Use domain.com or *.domain.com",
+    "alreadyExists": "Domain already exists"
+  },
+  "api": {
+    "title": "Translation API",
+    "note": "Note:",
+    "noteLink": "Youdao API credentials are required for translation features. Get your API keys from Youdao AI Platform",
+    "appKey": {
+      "label": "App Key",
+      "placeholder": "Enter your Youdao App Key"
+    },
+    "appSecret": {
+      "label": "App Secret",
+      "placeholder": "Enter your Youdao App Secret"
+    }
+  },
+  "advanced": {
+    "title": "Advanced",
+    "export": {
+      "label": "Export Settings",
+      "description": "Export your settings to a JSON file for backup",
+      "button": "Export Settings"
+    },
+    "import": {
+      "label": "Import Settings",
+      "description": "Import settings from a previously exported file",
+      "button": "Import Settings"
+    }
+  },
+  "actions": {
+    "save": "Save Settings",
+    "reset": "Reset to Defaults"
+  },
+  "tabs": {
+    "translation": "Translation",
+    "vocabulary": "Vocabulary"
+  },
+  "translation": {
+    "noSelection": "No text selected",
+    "selectText": "Select text on the page to view translation",
+    "loading": "Translating...",
+    "error": "Translation failed",
+    "phonetic": "Phonetic",
+    "examples": "Examples",
+    "noExamples": "No examples available"
+  },
+  "vocabulary": {
+    "title": "My Vocabulary",
+    "empty": "No saved words yet",
+    "search": "Search words...",
+    "filter": {
+      "all": "All",
+      "starred": "Starred",
+      "mastered": "Mastered"
+    },
+    "sort": {
+      "recent": "Recent",
+      "frequency": "Frequency",
+      "alphabetical": "Alphabetical"
+    },
+    "actions": {
+      "star": "Star",
+      "unstar": "Unstar",
+      "delete": "Delete",
+      "markMastered": "Mark as Mastered",
+      "markUnmastered": "Mark as Unmastered"
+    },
+    "stats": {
+      "total": "Total",
+      "starred": "Starred",
+      "mastered": "Mastered"
+    }
+  },
+  "stats": {
+    "title": "Reading Statistics",
+    "subtitle": "Track your progress",
+    "loading": "Loading statistics...",
+    "loadError": "Failed to load statistics. Please try again.",
+    "failedToLoad": "Failed to load data",
+    "retry": "Retry",
+    "refresh": "Refresh",
+    "today": {
+      "wordsToday": "Words Today",
+      "translations": "Translations",
+      "sitesVisited": "Sites Visited",
+      "readingTime": "Reading Time"
+    },
+    "allTime": {
+      "title": "All-Time Stats",
+      "totalWords": "Total Words",
+      "daysActive": "Days Active",
+      "translations": "Translations",
+      "readingTime": "Reading Time"
+    },
+    "charts": {
+      "topWords": "Top 10 Words",
+      "frequency": "Frequency",
+      "weeklyTrend": "7-Day Trend",
+      "wordsRead": "Words Read"
+    },
+    "vocabulary": {
+      "title": "Vocabulary",
+      "savedWords": "Words saved in your collection",
+      "viewList": "View Vocabulary List"
+    },
+    "actions": {
+      "openPanel": "Open Translation Panel"
+    }
+  },
+  "wordCard": {
+    "deleteConfirm": "Delete \"{word}\"?",
+    "addTag": "Add tag...",
+    "examples": "Examples",
+    "noExamples": "No examples available",
+    "addExample": "Add example sentence...",
+    "notes": "Notes",
+    "addNote": "Add personal notes...",
+    "added": "Added",
+    "lastReviewed": "Last reviewed"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "close": "Close",
+    "retry": "Retry"
+  }
+}

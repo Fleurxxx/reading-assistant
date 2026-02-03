@@ -1,6 +1,7 @@
 import { BookMarked, Languages } from "lucide-react";
 import { useEffect, useState } from "react";
 import VocabularyList from "../components/VocabularyList";
+import { useTranslation } from "../i18n";
 import type { TranslationResult, Vocabulary } from "../storage/db";
 import { addMessageListener, type Message, MessageType } from "../utils/messaging";
 import TranslationView from "./TranslationView";
@@ -15,6 +16,7 @@ interface AppState {
 type TabView = "translation" | "vocabulary";
 
 function App() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabView>("translation");
   const [state, setState] = useState<AppState>({
     selectedText: "",
@@ -83,6 +85,7 @@ function App() {
       <div className="flex-shrink-0 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
         <div className="flex">
           <button
+            type="button"
             onClick={() => setActiveTab("translation")}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 font-medium text-sm transition-colors border-b-2 ${
               activeTab === "translation"
@@ -91,9 +94,10 @@ function App() {
             }`}
           >
             <Languages className="w-4 h-4" />
-            Translation
+            {t.tabs.translation}
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab("vocabulary")}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 font-medium text-sm transition-colors border-b-2 ${
               activeTab === "vocabulary"
@@ -102,7 +106,7 @@ function App() {
             }`}
           >
             <BookMarked className="w-4 h-4" />
-            Vocabulary
+            {t.tabs.vocabulary}
           </button>
         </div>
       </div>

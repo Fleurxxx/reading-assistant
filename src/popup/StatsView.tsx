@@ -5,12 +5,14 @@ import {
   Globe,
   Languages,
   RefreshCw,
+  Settings,
   Star,
   TrendingUp,
 } from "lucide-react";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BarChart, LineChart } from "../components/FrequencyChart";
+import { useTranslation } from "../i18n";
 import type { ReadingStats, Word } from "../storage/db";
 import { db } from "../storage/db";
 import { statsRepository } from "../storage/statsRepository";
@@ -31,11 +33,12 @@ interface StatsData {
 }
 
 const StatsView: React.FC = () => {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -57,11 +60,11 @@ const StatsView: React.FC = () => {
       });
     } catch (err) {
       console.error("Failed to load stats:", err);
-      setError("Failed to load statistics. Please try again.");
+      setError(t.stats.loadError);
     } finally {
       setLoading(false);
     }
-  };
+  }, [t.stats.loadError]);
 
   useEffect(() => {
     loadStats();
@@ -84,7 +87,7 @@ const StatsView: React.FC = () => {
       <div className="w-[400px] h-[600px] bg-white dark:bg-gray-900 p-6 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <RefreshCw className="w-8 h-8 text-sky-500 animate-spin" />
-          <p className="text-sm text-gray-600 dark:text-gray-400">Loading statistics...</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t.stats.loading}</p>
         </div>
       </div>
     );
@@ -98,13 +101,14 @@ const StatsView: React.FC = () => {
             <span className="text-2xl">⚠️</span>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {error || "Failed to load data"}
+            {error || t.stats.failedToLoad}
           </p>
           <button
+            type="button"
             onClick={loadStats}
             className="mt-2 px-4 py-2 bg-sky-500 text-white text-sm rounded-lg hover:bg-sky-600 transition-colors"
           >
-            Retry
+            {t.stats.retry}
           </button>
         </div>
       </div>
@@ -135,16 +139,27 @@ const StatsView: React.FC = () => {
       <div className="sticky top-0 bg-gradient-to-r from-sky-500 to-blue-600 text-white p-5 shadow-lg z-10">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold">Reading Statistics</h1>
-            <p className="text-xs text-sky-100 mt-1">Track your progress</p>
+            <h1 className="text-xl font-bold">{t.stats.title}</h1>
+            <p className="text-xs text-sky-100 mt-1">{t.stats.subtitle}</p>
           </div>
-          <button
-            onClick={loadStats}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-            title="Refresh"
-          >
-            <RefreshCw className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={openVocabulary}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              title={t.settings.title}
+            >
+              <Settings className="w-5 h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={loadStats}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              title={t.stats.refresh}
+            >
+              <RefreshCw className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -153,25 +168,25 @@ const StatsView: React.FC = () => {
         <div className="grid grid-cols-2 gap-3">
           <StatCard
             icon={<BookOpen className="w-5 h-5" />}
-            label="Words Today"
+            label={t.stats.today.wordsToday}
             value={stats.today.wordsCount.toLocaleString()}
             color="bg-blue-500"
           />
           <StatCard
             icon={<Languages className="w-5 h-5" />}
-            label="Translations"
+            label={t.stats.today.translations}
             value={stats.today.translationCount.toLocaleString()}
             color="bg-purple-500"
           />
           <StatCard
             icon={<Globe className="w-5 h-5" />}
-            label="Sites Visited"
+            label={t.stats.today.sitesVisited}
             value={stats.today.domainsVisited.length.toString()}
             color="bg-green-500"
           />
           <StatCard
             icon={<Clock className="w-5 h-5" />}
-            label="Reading Time"
+            label={t.stats.today.readingTime}
             value={`${stats.today.readingTime}m`}
             color="bg-orange-500"
           />
@@ -183,30 +198,30 @@ const StatsView: React.FC = () => {
             <div className="flex items-center gap-2 mb-3">
               <TrendingUp className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
-                All-Time Stats
+                {t.stats.allTime.title}
               </h2>
             </div>
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div>
-                <p className="text-gray-600 dark:text-gray-400">Total Words</p>
+                <p className="text-gray-600 dark:text-gray-400">{t.stats.allTime.totalWords}</p>
                 <p className="text-lg font-bold text-gray-900 dark:text-white">
                   {stats.allTime.totalWords.toLocaleString()}
                 </p>
               </div>
               <div>
-                <p className="text-gray-600 dark:text-gray-400">Days Active</p>
+                <p className="text-gray-600 dark:text-gray-400">{t.stats.allTime.daysActive}</p>
                 <p className="text-lg font-bold text-gray-900 dark:text-white">
                   {stats.allTime.totalDays}
                 </p>
               </div>
               <div>
-                <p className="text-gray-600 dark:text-gray-400">Translations</p>
+                <p className="text-gray-600 dark:text-gray-400">{t.stats.allTime.translations}</p>
                 <p className="text-lg font-bold text-gray-900 dark:text-white">
                   {stats.allTime.totalTranslations.toLocaleString()}
                 </p>
               </div>
               <div>
-                <p className="text-gray-600 dark:text-gray-400">Reading Time</p>
+                <p className="text-gray-600 dark:text-gray-400">{t.stats.allTime.readingTime}</p>
                 <p className="text-lg font-bold text-gray-900 dark:text-white">
                   {stats.allTime.totalReadingTime}m
                 </p>
@@ -220,12 +235,14 @@ const StatsView: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-3">
               <Star className="w-4 h-4 text-yellow-500" />
-              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Top 10 Words</h2>
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+                {t.stats.charts.topWords}
+              </h2>
             </div>
             <BarChart
               labels={stats.topWords.map((w) => w.word)}
               data={stats.topWords.map((w) => w.count)}
-              label="Frequency"
+              label={t.stats.charts.frequency}
               color="#0ea5e9"
               height={180}
             />
@@ -237,18 +254,20 @@ const StatsView: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-3">
               <TrendingUp className="w-4 h-4 text-green-500" />
-              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">7-Day Trend</h2>
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+                {t.stats.charts.weeklyTrend}
+              </h2>
             </div>
             <LineChart
               labels={weeklyLabels}
               datasets={[
                 {
-                  label: "Words Read",
+                  label: t.stats.charts.wordsRead,
                   data: weeklyWordsData,
                   color: "#0ea5e9",
                 },
                 {
-                  label: "Translations",
+                  label: t.stats.allTime.translations,
                   data: weeklyTranslationsData,
                   color: "#8b5cf6",
                 },
@@ -263,31 +282,35 @@ const StatsView: React.FC = () => {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <BookMarked className="w-4 h-4 text-green-600 dark:text-green-400" />
-              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Vocabulary</h2>
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+                {t.stats.vocabulary.title}
+              </h2>
             </div>
             <span className="text-2xl font-bold text-green-600 dark:text-green-400">
               {stats.totalVocabulary}
             </span>
           </div>
           <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-            Words saved in your collection
+            {t.stats.vocabulary.savedWords}
           </p>
           <button
+            type="button"
             onClick={openVocabulary}
             className="w-full py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg transition-colors"
           >
-            View Vocabulary List
+            {t.stats.vocabulary.viewList}
           </button>
         </div>
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 gap-2 pb-2">
           <button
+            type="button"
             onClick={openSidePanel}
             className="py-3 bg-sky-500 hover:bg-sky-600 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
           >
             <Languages className="w-4 h-4" />
-            Open Translation Panel
+            {t.stats.actions.openPanel}
           </button>
         </div>
       </div>

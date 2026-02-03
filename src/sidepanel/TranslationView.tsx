@@ -10,6 +10,7 @@ import {
   Volume2,
 } from "lucide-react";
 import React, { useRef, useState } from "react";
+import { useTranslation } from "../i18n";
 import type { TranslationResult } from "../storage/db";
 import { vocabularyRepository } from "../storage/vocabularyRepository";
 import { MessageType, sendMessage } from "../utils/messaging";
@@ -22,6 +23,7 @@ interface TranslationViewProps {
 }
 
 function TranslationView({ selectedText, translation, isLoading, error }: TranslationViewProps) {
+  const { t } = useTranslation();
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -125,11 +127,10 @@ function TranslationView({ selectedText, translation, isLoading, error }: Transl
       <div className="flex flex-col items-center justify-center h-full p-8 text-center">
         <BookOpen className="w-16 h-16 text-slate-300 dark:text-slate-600 mb-4" />
         <h2 className="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
-          Select Text to Translate
+          {t.translation.noSelection}
         </h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs">
-          Highlight any English text on the page to see its translation and add it to your
-          vocabulary.
+          {t.translation.selectText}
         </p>
         <div className="mt-6 text-xs text-slate-400 dark:text-slate-500">
           <p>
@@ -147,7 +148,7 @@ function TranslationView({ selectedText, translation, isLoading, error }: Transl
     return (
       <div className="flex flex-col items-center justify-center h-full p-8">
         <Loader2 className="w-12 h-12 text-sky-500 animate-spin mb-4" />
-        <p className="text-sm text-slate-600 dark:text-slate-400">Translating...</p>
+        <p className="text-sm text-slate-600 dark:text-slate-400">{t.translation.loading}</p>
       </div>
     );
   }
@@ -158,10 +159,11 @@ function TranslationView({ selectedText, translation, isLoading, error }: Transl
       <div className="flex flex-col items-center justify-center h-full p-8 text-center">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
         <h3 className="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
-          Translation Error
+          {t.translation.error}
         </h3>
         <p className="text-sm text-slate-600 dark:text-slate-400 max-w-xs">{error}</p>
         <button
+          type="button"
           onClick={() => window.location.reload()}
           className="mt-4 px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors text-sm"
         >
@@ -176,7 +178,9 @@ function TranslationView({ selectedText, translation, isLoading, error }: Transl
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="flex-shrink-0 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
-        <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Translation</h1>
+        <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
+          {t.tabs.translation}
+        </h1>
       </div>
 
       {/* Content */}
@@ -188,6 +192,7 @@ function TranslationView({ selectedText, translation, isLoading, error }: Transl
               Original Text
             </h2>
             <button
+              type="button"
               onClick={playPronunciation}
               disabled={isPlayingAudio}
               className={`p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors ${
@@ -215,6 +220,7 @@ function TranslationView({ selectedText, translation, isLoading, error }: Transl
                 Chinese Translation
               </h2>
               <button
+                type="button"
                 onClick={copyToClipboard}
                 className="p-1.5 rounded-md hover:bg-white/50 dark:hover:bg-slate-600 transition-colors"
                 title="Copy translation"
@@ -239,9 +245,9 @@ function TranslationView({ selectedText, translation, isLoading, error }: Transl
               Detailed Explanations
             </h2>
             <ul className="space-y-2">
-              {translation.explains.map((explain, index) => (
+              {translation.explains.map((explain) => (
                 <li
-                  key={index}
+                  key={explain}
                   className="text-sm text-slate-700 dark:text-slate-300 flex items-start gap-2"
                 >
                   <span className="text-sky-500 dark:text-sky-400 mt-0.5">•</span>
@@ -259,9 +265,9 @@ function TranslationView({ selectedText, translation, isLoading, error }: Transl
               Example Sentences
             </h2>
             <div className="space-y-3">
-              {translation.examples.map((example, index) => (
+              {translation.examples.map((example) => (
                 <div
-                  key={index}
+                  key={example}
                   className="text-sm p-3 bg-slate-50 dark:bg-slate-700/50 rounded border-l-2 border-sky-400 dark:border-sky-500"
                 >
                   <p className="text-slate-700 dark:text-slate-300 italic">{example}</p>
@@ -278,8 +284,8 @@ function TranslationView({ selectedText, translation, isLoading, error }: Transl
               Web Translations
             </h2>
             <div className="space-y-2">
-              {translation.webTranslations.map((web, index) => (
-                <div key={index} className="text-sm">
+              {translation.webTranslations.map((web) => (
+                <div key={web.key} className="text-sm">
                   <span className="font-medium text-slate-700 dark:text-slate-300">{web.key}:</span>
                   <span className="text-slate-600 dark:text-slate-400 ml-2">
                     {web.value.join("; ")}
@@ -294,6 +300,7 @@ function TranslationView({ selectedText, translation, isLoading, error }: Transl
       {/* Footer - Action Buttons */}
       <div className="flex-shrink-0 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
         <button
+          type="button"
           onClick={addToVocabulary}
           disabled={isSaved}
           className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-all ${
@@ -305,12 +312,12 @@ function TranslationView({ selectedText, translation, isLoading, error }: Transl
           {isSaved ? (
             <>
               <BookmarkCheck className="w-5 h-5" />
-              Added to Vocabulary
+              {t.vocabulary.actions.markMastered}
             </>
           ) : (
             <>
               <BookmarkPlus className="w-5 h-5" />
-              Add to Vocabulary
+              {t.vocabulary.actions.star}
             </>
           )}
         </button>

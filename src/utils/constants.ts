@@ -17,6 +17,7 @@ export interface AppSettings {
   theme: "light" | "dark" | "auto";
   fontSize: number;
   enableShortcuts: boolean;
+  language: "zh" | "en";
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -27,6 +28,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   theme: "auto",
   fontSize: 14,
   enableShortcuts: true,
+  language: "en",
 };
 
 // API 配置

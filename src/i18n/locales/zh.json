@@ -1,0 +1,202 @@
+{
+  "app": {
+    "name": "英语阅读助手",
+    "description": "配置您的阅读增强偏好设置"
+  },
+  "settings": {
+    "title": "英语阅读助手",
+    "description": "配置您的阅读增强偏好设置",
+    "loading": "加载设置中...",
+    "saving": "保存中...",
+    "saveSuccess": "设置保存成功！",
+    "saveError": "保存设置失败",
+    "loadError": "加载设置失败",
+    "resetConfirm": "确定要将所有设置重置为默认值吗？",
+    "resetSuccess": "设置已重置为默认值",
+    "exportSuccess": "设置导出成功",
+    "importSuccess": "设置导入成功",
+    "importError": "导入设置失败",
+    "invalidFile": "无效的设置文件",
+    "parseError": "解析设置文件失败"
+  },
+  "general": {
+    "title": "通用设置",
+    "autoAnalysis": {
+      "label": "自动分析",
+      "description": "自动分析您访问页面的文本"
+    },
+    "shortcuts": {
+      "label": "启用键盘快捷键",
+      "description": "使用键盘快捷键快速翻译"
+    }
+  },
+  "appearance": {
+    "title": "外观",
+    "theme": {
+      "label": "主题",
+      "light": "浅色",
+      "dark": "深色",
+      "auto": "自动"
+    },
+    "fontSize": {
+      "label": "字体大小"
+    },
+    "sidePanelPosition": {
+      "label": "侧边栏位置",
+      "left": "左侧",
+      "right": "右侧"
+    },
+    "language": {
+      "label": "显示语言",
+      "description": "选择插件界面的显示语言",
+      "zh": "简体中文",
+      "en": "English"
+    }
+  },
+  "domain": {
+    "title": "域名管理",
+    "blacklist": {
+      "label": "黑名单域名",
+      "description": "在这些域名上禁用单词分析（例如：github.com 或 *.google.com）",
+      "placeholder": "example.com 或 *.example.com"
+    },
+    "whitelist": {
+      "label": "白名单域名",
+      "description": "仅在这些域名上分析文本（留空则分析所有）",
+      "placeholder": "example.com 或 *.example.com"
+    },
+    "add": "添加",
+    "remove": "移除",
+    "invalidFormat": "无效的域名格式。请使用 domain.com 或 *.domain.com",
+    "alreadyExists": "域名已存在"
+  },
+  "api": {
+    "title": "翻译 API",
+    "note": "注意：",
+    "noteLink": "翻译功能需要有道 API 凭证。请从有道 AI 平台获取您的 API 密钥",
+    "appKey": {
+      "label": "App Key",
+      "placeholder": "输入您的有道 App Key"
+    },
+    "appSecret": {
+      "label": "App Secret",
+      "placeholder": "输入您的有道 App Secret"
+    }
+  },
+  "advanced": {
+    "title": "高级",
+    "export": {
+      "label": "导出设置",
+      "description": "将您的设置导出为 JSON 文件以备份",
+      "button": "导出设置"
+    },
+    "import": {
+      "label": "导入设置",
+      "description": "从之前导出的文件导入设置",
+      "button": "导入设置"
+    }
+  },
+  "actions": {
+    "save": "保存设置",
+    "reset": "重置为默认"
+  },
+  "tabs": {
+    "translation": "翻译",
+    "vocabulary": "词汇表"
+  },
+  "translation": {
+    "noSelection": "未选择文本",
+    "selectText": "选择网页上的文本以查看翻译",
+    "loading": "翻译中...",
+    "error": "翻译失败",
+    "phonetic": "音标",
+    "examples": "例句",
+    "noExamples": "暂无例句"
+  },
+  "vocabulary": {
+    "title": "我的词汇表",
+    "empty": "还没有保存的单词",
+    "search": "搜索单词...",
+    "filter": {
+      "all": "全部",
+      "starred": "已收藏",
+      "mastered": "已掌握"
+    },
+    "sort": {
+      "recent": "最近",
+      "frequency": "频率",
+      "alphabetical": "字母"
+    },
+    "actions": {
+      "star": "收藏",
+      "unstar": "取消收藏",
+      "delete": "删除",
+      "markMastered": "标记为已掌握",
+      "markUnmastered": "标记为未掌握"
+    },
+    "stats": {
+      "total": "总计",
+      "starred": "已收藏",
+      "mastered": "已掌握"
+    }
+  },
+  "stats": {
+    "title": "阅读统计",
+    "subtitle": "追踪您的进步",
+    "loading": "加载统计中...",
+    "loadError": "加载统计失败。请重试。",
+    "failedToLoad": "加载数据失败",
+    "retry": "重试",
+    "refresh": "刷新",
+    "today": {
+      "wordsToday": "今日单词",
+      "translations": "翻译次数",
+      "sitesVisited": "访问网站",
+      "readingTime": "阅读时长"
+    },
+    "allTime": {
+      "title": "总计统计",
+      "totalWords": "总单词数",
+      "daysActive": "活跃天数",
+      "translations": "翻译次数",
+      "readingTime": "阅读时长"
+    },
+    "charts": {
+      "topWords": "高频单词 Top 10",
+      "frequency": "频率",
+      "weeklyTrend": "7 天趋势",
+      "wordsRead": "已读单词"
+    },
+    "vocabulary": {
+      "title": "词汇表",
+      "savedWords": "已保存的单词数量",
+      "viewList": "查看词汇表"
+    },
+    "actions": {
+      "openPanel": "打开翻译面板"
+    }
+  },
+  "wordCard": {
+    "deleteConfirm": "删除 \"{word}\" ？",
+    "addTag": "添加标签...",
+    "examples": "例句",
+    "noExamples": "暂无例句",
+    "addExample": "添加例句...",
+    "notes": "笔记",
+    "addNote": "添加个人笔记...",
+    "added": "添加于",
+    "lastReviewed": "上次复习"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "cancel": "取消",
+    "confirm": "确认",
+    "delete": "删除",
+    "edit": "编辑",
+    "save": "保存",
+    "close": "关闭",
+    "retry": "重试"
+  }
+}
